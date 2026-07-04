@@ -589,3 +589,15 @@ nav {
     grid-template-columns: 1fr;
   }
 }
+.report-box {
+  white-space: pre-wrap;
+  margin: 0;
+  padding: 20px;
+  border: 1px solid rgba(255, 179, 71, 0.22);
+  border-radius: 16px;
+  background: rgba(7, 11, 16, 0.65);
+  color: #dce5ee;
+  font-family: Consolas, 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+}

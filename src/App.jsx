@@ -8,6 +8,7 @@ const pages = [
   'Inventory',
   'Medical Beds',
   'Operations',
+  'Reports',
 ]
 
 function getStatusClass(status) {
@@ -378,6 +379,14 @@ function App() {
             isAdminMode={isAdminMode}
           />
         )}
+        {activePage === 'Reports' && (
+  <Reports
+    inventoryItems={inventoryItems}
+    fleetShips={fleetShips}
+    medicalBeds={medicalBeds}
+    operations={operations}
+  />
+)}
       </main>
     </div>
   )
@@ -1151,5 +1160,68 @@ function MedicalBedsPreview({ medicalBeds }) {
     </section>
   )
 }
+function Reports({ inventoryItems, fleetShips, medicalBeds, operations }) {
+  const lowStockItems = inventoryItems.filter((item) => item.quantity <= 30)
+  const readyShips = fleetShips.filter((ship) => ship.status === 'Ready')
+  const pendingOperations = operations.filter(
+    (mission) => mission.status === 'Standby' || mission.status === 'Reserved',
+  )
 
+  const reportText = `
+PHOENIX SQUADRON MEDICAL REPORT
+
+Medical Readiness: GREEN
+Ships Ready: ${readyShips.length}
+Pending Operations: ${pendingOperations.length}
+
+LOW STOCK ITEMS:
+${
+  lowStockItems.length > 0
+    ? lowStockItems
+        .map((item) => `- ${item.item}: ${item.quantity} (${getStockLevel(item.quantity)})`)
+        .join('\n')
+    : '- No low stock items'
+}
+
+FLEET STATUS:
+${fleetShips
+  .map((ship) => `- ${ship.name}: ${ship.status} / Crew: ${ship.crew}`)
+  .join('\n')}
+
+NORMANDY MEDICAL BEDS:
+${medicalBeds
+  .map((bed) => `- ${bed.bed} ${bed.designation}: ${bed.assignedTo} / ${bed.status}`)
+  .join('\n')}
+
+OPERATIONS BOARD:
+${operations
+  .map(
+    (mission) =>
+      `- ${mission.operation}: ${mission.status} / ${mission.priority} / Asset: ${mission.asset}`,
+  )
+  .join('\n')}
+`.trim()
+
+  function copyReport() {
+    navigator.clipboard.writeText(reportText)
+    window.alert('Phoenix Medical report copied to clipboard')
+  }
+
+  return (
+    <section className="panel">
+      <div className="panel-header">
+        <div>
+          <p className="eyebrow">Command Summary</p>
+          <h3>Export Report</h3>
+        </div>
+
+        <button className="admin-button" onClick={copyReport}>
+          Copy Report
+        </button>
+      </div>
+
+      <pre className="report-box">{reportText}</pre>
+    </section>
+  )
+}
 export default App
