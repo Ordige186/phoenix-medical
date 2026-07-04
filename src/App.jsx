@@ -186,6 +186,7 @@ const personnelRoster = [
 
 function App() {
   const [activePage, setActivePage] = useState('Dashboard')
+  const [isAdminMode, setIsAdminMode] = useState(false)
 
   const [inventoryItems, setInventoryItems] = useState(() => {
     const savedInventory = localStorage.getItem('phoenixInventory')
@@ -259,6 +260,16 @@ function App() {
             </button>
           ))}
         </nav>
+
+        <div className="admin-toggle">
+          <p>Access Mode</p>
+          <button
+            className={isAdminMode ? 'mode-button active' : 'mode-button'}
+            onClick={() => setIsAdminMode(!isAdminMode)}
+          >
+            {isAdminMode ? 'Admin Mode' : 'View Mode'}
+          </button>
+        </div>
       </aside>
 
       <main className="main">
@@ -274,7 +285,11 @@ function App() {
         {activePage === 'Personnel' && <Personnel />}
 
         {activePage === 'Fleet' && (
-          <Fleet fleetShips={fleetShips} setFleetShips={setFleetShips} />
+          <Fleet
+            fleetShips={fleetShips}
+            setFleetShips={setFleetShips}
+            isAdminMode={isAdminMode}
+          />
         )}
 
         {activePage === 'Inventory' && (
@@ -282,6 +297,7 @@ function App() {
             inventoryItems={inventoryItems}
             setInventoryItems={setInventoryItems}
             resetInventory={() => setInventoryItems(startingInventoryItems)}
+            isAdminMode={isAdminMode}
           />
         )}
 
@@ -289,6 +305,7 @@ function App() {
           <MedicalBeds
             medicalBeds={medicalBeds}
             setMedicalBeds={setMedicalBeds}
+            isAdminMode={isAdminMode}
           />
         )}
 
@@ -388,7 +405,7 @@ function Personnel() {
   )
 }
 
-function Fleet({ fleetShips, setFleetShips }) {
+function Fleet({ fleetShips, setFleetShips, isAdminMode }) {
   function updateShipStatus(shipName, newStatus) {
     const updatedFleet = fleetShips.map((ship) => {
       if (ship.name === shipName) {
@@ -432,10 +449,12 @@ function Fleet({ fleetShips, setFleetShips }) {
         </div>
 
         <div className="panel-actions">
-          <button className="admin-button" onClick={resetFleet}>
-            Reset Fleet
-          </button>
-          <span className="tag">Admin Mode</span>
+          {isAdminMode && (
+            <button className="admin-button" onClick={resetFleet}>
+              Reset Fleet
+            </button>
+          )}
+          <span className="tag">{isAdminMode ? 'Admin Mode' : 'View Mode'}</span>
         </div>
       </div>
 
@@ -445,28 +464,44 @@ function Fleet({ fleetShips, setFleetShips }) {
             <span>{ship.name}</span>
             <strong>{ship.role}</strong>
 
-            <label className="field-label">Status</label>
-            <select
-              className={`status-select ${getStatusClass(ship.status)}`}
-              value={ship.status}
-              onChange={(event) =>
-                updateShipStatus(ship.name, event.target.value)
-              }
-            >
-              <option>Ready</option>
-              <option>Standby</option>
-              <option>Reserved</option>
-              <option>Occupied</option>
-              <option>Offline</option>
-            </select>
+            {isAdminMode ? (
+              <>
+                <label className="field-label">Status</label>
+                <select
+                  className={`status-select ${getStatusClass(ship.status)}`}
+                  value={ship.status}
+                  onChange={(event) =>
+                    updateShipStatus(ship.name, event.target.value)
+                  }
+                >
+                  <option>Ready</option>
+                  <option>Standby</option>
+                  <option>Reserved</option>
+                  <option>Occupied</option>
+                  <option>Offline</option>
+                </select>
 
-            <label className="field-label">Crew</label>
-            <input
-              className="inline-input"
-              type="text"
-              value={ship.crew}
-              onChange={(event) => updateShipCrew(ship.name, event.target.value)}
-            />
+                <label className="field-label">Crew</label>
+                <input
+                  className="inline-input"
+                  type="text"
+                  value={ship.crew}
+                  onChange={(event) =>
+                    updateShipCrew(ship.name, event.target.value)
+                  }
+                />
+              </>
+            ) : (
+              <>
+                <p>
+                  Status:{' '}
+                  <span className={getStatusClass(ship.status)}>
+                    {ship.status}
+                  </span>
+                </p>
+                <p>Crew: {ship.crew}</p>
+              </>
+            )}
 
             <p>Assignment: {ship.assignment}</p>
           </div>
@@ -476,7 +511,12 @@ function Fleet({ fleetShips, setFleetShips }) {
   )
 }
 
-function Inventory({ inventoryItems, setInventoryItems, resetInventory }) {
+function Inventory({
+  inventoryItems,
+  setInventoryItems,
+  resetInventory,
+  isAdminMode,
+}) {
   const [searchTerm, setSearchTerm] = useState('')
   const [newItem, setNewItem] = useState('')
   const [newCategory, setNewCategory] = useState('')
@@ -561,51 +601,55 @@ function Inventory({ inventoryItems, setInventoryItems, resetInventory }) {
         </div>
 
         <div className="panel-actions">
-          <button className="admin-button" onClick={resetInventory}>
-            Reset Inventory
-          </button>
-          <span className="tag">Admin Mode</span>
+          {isAdminMode && (
+            <button className="admin-button" onClick={resetInventory}>
+              Reset Inventory
+            </button>
+          )}
+          <span className="tag">{isAdminMode ? 'Admin Mode' : 'View Mode'}</span>
         </div>
       </div>
 
-      <form className="admin-form" onSubmit={addInventoryItem}>
-        <input
-          type="text"
-          placeholder="Item name"
-          value={newItem}
-          onChange={(event) => setNewItem(event.target.value)}
-        />
+      {isAdminMode && (
+        <form className="admin-form" onSubmit={addInventoryItem}>
+          <input
+            type="text"
+            placeholder="Item name"
+            value={newItem}
+            onChange={(event) => setNewItem(event.target.value)}
+          />
 
-        <input
-          type="text"
-          placeholder="Category"
-          value={newCategory}
-          onChange={(event) => setNewCategory(event.target.value)}
-        />
+          <input
+            type="text"
+            placeholder="Category"
+            value={newCategory}
+            onChange={(event) => setNewCategory(event.target.value)}
+          />
 
-        <input
-          type="number"
-          placeholder="Quantity"
-          min="0"
-          value={newQuantity}
-          onChange={(event) => setNewQuantity(event.target.value)}
-        />
+          <input
+            type="number"
+            placeholder="Quantity"
+            min="0"
+            value={newQuantity}
+            onChange={(event) => setNewQuantity(event.target.value)}
+          />
 
-        <select
-          value={newStatus}
-          onChange={(event) => setNewStatus(event.target.value)}
-        >
-          <option>Ready</option>
-          <option>In Stock</option>
-          <option>Monitor</option>
-          <option>Reserved</option>
-          <option>Open</option>
-        </select>
+          <select
+            value={newStatus}
+            onChange={(event) => setNewStatus(event.target.value)}
+          >
+            <option>Ready</option>
+            <option>In Stock</option>
+            <option>Monitor</option>
+            <option>Reserved</option>
+            <option>Open</option>
+          </select>
 
-        <button className="admin-button" type="submit">
-          Add Item
-        </button>
-      </form>
+          <button className="admin-button" type="submit">
+            Add Item
+          </button>
+        </form>
+      )}
 
       <input
         className="search-box"
@@ -615,14 +659,14 @@ function Inventory({ inventoryItems, setInventoryItems, resetInventory }) {
         onChange={(event) => setSearchTerm(event.target.value)}
       />
 
-      <div className="table inventory-table">
+      <div className={isAdminMode ? 'table inventory-table' : 'table inventory-table view-only'}>
         <div className="table-row table-head">
           <span>Item</span>
           <span>Category</span>
           <span>Quantity</span>
           <span>Stock Level</span>
           <span>Status</span>
-          <span>Controls</span>
+          {isAdminMode && <span>Controls</span>}
         </div>
 
         {filteredItems.map((supply) => (
@@ -639,42 +683,50 @@ function Inventory({ inventoryItems, setInventoryItems, resetInventory }) {
               {getStockLevel(supply.quantity)}
             </span>
 
-            <select
-              className={`status-select ${getStatusClass(supply.status)}`}
-              value={supply.status}
-              onChange={(event) =>
-                updateItemStatus(supply.item, event.target.value)
-              }
-            >
-              <option>Ready</option>
-              <option>In Stock</option>
-              <option>Monitor</option>
-              <option>Reserved</option>
-              <option>Open</option>
-            </select>
-
-            <span className="control-group">
-              <button
-                className="small-button"
-                onClick={() => updateQuantity(supply.item, -1)}
+            {isAdminMode ? (
+              <select
+                className={`status-select ${getStatusClass(supply.status)}`}
+                value={supply.status}
+                onChange={(event) =>
+                  updateItemStatus(supply.item, event.target.value)
+                }
               >
-                -
-              </button>
+                <option>Ready</option>
+                <option>In Stock</option>
+                <option>Monitor</option>
+                <option>Reserved</option>
+                <option>Open</option>
+              </select>
+            ) : (
+              <span className={getStatusClass(supply.status)}>
+                {supply.status}
+              </span>
+            )}
 
-              <button
-                className="small-button"
-                onClick={() => updateQuantity(supply.item, 1)}
-              >
-                +
-              </button>
+            {isAdminMode && (
+              <span className="control-group">
+                <button
+                  className="small-button"
+                  onClick={() => updateQuantity(supply.item, -1)}
+                >
+                  -
+                </button>
 
-              <button
-                className="small-button danger"
-                onClick={() => deleteInventoryItem(supply.item)}
-              >
-                ×
-              </button>
-            </span>
+                <button
+                  className="small-button"
+                  onClick={() => updateQuantity(supply.item, 1)}
+                >
+                  +
+                </button>
+
+                <button
+                  className="small-button danger"
+                  onClick={() => deleteInventoryItem(supply.item)}
+                >
+                  ×
+                </button>
+              </span>
+            )}
           </div>
         ))}
       </div>
@@ -682,7 +734,7 @@ function Inventory({ inventoryItems, setInventoryItems, resetInventory }) {
   )
 }
 
-function MedicalBeds({ medicalBeds, setMedicalBeds }) {
+function MedicalBeds({ medicalBeds, setMedicalBeds, isAdminMode }) {
   function updateBedAssignment(bedName, newAssignment) {
     const updatedBeds = medicalBeds.map((bed) => {
       if (bed.bed === bedName) {
@@ -726,10 +778,12 @@ function MedicalBeds({ medicalBeds, setMedicalBeds }) {
         </div>
 
         <div className="panel-actions">
-          <button className="admin-button" onClick={resetBeds}>
-            Reset Beds
-          </button>
-          <span className="tag">Admin Mode</span>
+          {isAdminMode && (
+            <button className="admin-button" onClick={resetBeds}>
+              Reset Beds
+            </button>
+          )}
+          <span className="tag">{isAdminMode ? 'Admin Mode' : 'View Mode'}</span>
         </div>
       </div>
 
@@ -739,28 +793,44 @@ function MedicalBeds({ medicalBeds, setMedicalBeds }) {
             <span>{bed.bed}</span>
             <strong>{bed.designation}</strong>
 
-            <label className="field-label">Assigned To</label>
-            <input
-              className="inline-input"
-              type="text"
-              value={bed.assignedTo}
-              onChange={(event) =>
-                updateBedAssignment(bed.bed, event.target.value)
-              }
-            />
+            {isAdminMode ? (
+              <>
+                <label className="field-label">Assigned To</label>
+                <input
+                  className="inline-input"
+                  type="text"
+                  value={bed.assignedTo}
+                  onChange={(event) =>
+                    updateBedAssignment(bed.bed, event.target.value)
+                  }
+                />
 
-            <label className="field-label">Status</label>
-            <select
-              className={`status-select ${getStatusClass(bed.status)}`}
-              value={bed.status}
-              onChange={(event) => updateBedStatus(bed.bed, event.target.value)}
-            >
-              <option>Available</option>
-              <option>Standby</option>
-              <option>Open</option>
-              <option>Reserved</option>
-              <option>Occupied</option>
-            </select>
+                <label className="field-label">Status</label>
+                <select
+                  className={`status-select ${getStatusClass(bed.status)}`}
+                  value={bed.status}
+                  onChange={(event) =>
+                    updateBedStatus(bed.bed, event.target.value)
+                  }
+                >
+                  <option>Available</option>
+                  <option>Standby</option>
+                  <option>Open</option>
+                  <option>Reserved</option>
+                  <option>Occupied</option>
+                </select>
+              </>
+            ) : (
+              <>
+                <p>Assigned: {bed.assignedTo}</p>
+                <p>
+                  Status:{' '}
+                  <span className={getStatusClass(bed.status)}>
+                    {bed.status}
+                  </span>
+                </p>
+              </>
+            )}
 
             <p>Purpose: {bed.purpose}</p>
           </div>
@@ -846,7 +916,10 @@ function MedicalBedsPreview({ medicalBeds }) {
             <strong>{bed.designation}</strong>
             <p>Assigned: {bed.assignedTo}</p>
             <p>
-              Status: <span className={getStatusClass(bed.status)}>{bed.status}</span>
+              Status:{' '}
+              <span className={getStatusClass(bed.status)}>
+                {bed.status}
+              </span>
             </p>
           </div>
         ))}

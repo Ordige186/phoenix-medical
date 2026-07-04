@@ -499,3 +499,49 @@ nav {
   background: rgba(255, 107, 107, 0.08);
   border-color: rgba(255, 107, 107, 0.45);
 }
+.admin-toggle {
+  margin-top: 28px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(155, 168, 181, 0.16);
+}
+
+.admin-toggle p {
+  margin: 0 0 10px;
+  color: #9ba8b5;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: bold;
+}
+
+.mode-button {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid rgba(155, 168, 181, 0.18);
+  border-radius: 10px;
+  background: rgba(7, 11, 16, 0.45);
+  color: #c9d3df;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.mode-button.active {
+  color: #49f28d;
+  border-color: rgba(73, 242, 141, 0.45);
+  background: rgba(73, 242, 141, 0.08);
+}
+
+.mode-button:hover {
+  border-color: rgba(255, 179, 71, 0.55);
+}
+
+.inventory-table.view-only .table-row {
+  grid-template-columns: 1.2fr 1fr 0.6fr 0.8fr 0.9fr;
+}
+
+.status-offline,
+.status-occupied {
+  color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.08);
+  border-color: rgba(255, 107, 107, 0.45);
+}
