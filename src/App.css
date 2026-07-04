@@ -3395,3 +3395,241 @@ body {
     grid-template-columns: 1fr;
   }
 }
+/* =========================================================
+   V1 Polish Pass — Font Size, MEDEVAC Width, Priority Colors
+   ========================================================= */
+
+/* Slight global readability bump */
+body {
+  font-size: 15px !important;
+}
+
+/* Top bar and sidebar readability */
+.top-title span {
+  font-size: 17px !important;
+  letter-spacing: 5px !important;
+}
+
+.top-classification,
+.top-sync,
+.top-stat span {
+  font-size: 9px !important;
+}
+
+.top-stat strong {
+  font-size: 19px !important;
+}
+
+.sidebar-brand h1 {
+  font-size: 13px !important;
+}
+
+.sidebar-brand span {
+  font-size: 9px !important;
+}
+
+.sidebar-section-title {
+  font-size: 9px !important;
+  letter-spacing: 3px !important;
+}
+
+.ship-button,
+.nav-link {
+  font-size: 11px !important;
+}
+
+.ship-button small {
+  font-size: 8px !important;
+}
+
+/* General page headers */
+.panel-command-row h2,
+.medevac-title-block h2 {
+  font-size: 22px !important;
+  letter-spacing: 4px !important;
+}
+
+.section-kicker {
+  font-size: 10px !important;
+}
+
+/* Inventory / roster / reports text */
+.supply-row strong,
+.report-list-row strong,
+.personnel-board-row strong {
+  font-size: 14px !important;
+}
+
+.supply-row span,
+.supply-row em,
+.report-list-row small,
+.personnel-board-row span {
+  font-size: 12px !important;
+}
+
+/* Bed cards readability */
+.bed-card-header > span {
+  font-size: 12px !important;
+}
+
+.bed-location,
+.medgel-row,
+.bed-storage,
+.respawn-header {
+  font-size: 10px !important;
+}
+
+.bed-tile span {
+  font-size: 14px !important;
+}
+
+.bed-tile small {
+  font-size: 12px !important;
+}
+
+/* MEDEVAC 9-Liner closer to the reference size */
+.medevac-form-panel {
+  width: 880px !important;
+  max-width: calc(100% - 40px) !important;
+  margin: 20px !important;
+}
+
+.medevac-preview-box {
+  width: 880px !important;
+  max-width: calc(100% - 40px) !important;
+  margin: 16px 20px 22px !important;
+}
+
+/* MEDEVAC row sizing */
+.medevac-line-row {
+  grid-template-columns: 46px 250px minmax(0, 1fr) !important;
+  min-height: 62px !important;
+  padding: 14px 16px !important;
+}
+
+.medevac-line-number {
+  font-size: 32px !important;
+}
+
+.medevac-line-label strong {
+  font-size: 12px !important;
+}
+
+.medevac-line-label small {
+  font-size: 10px !important;
+}
+
+.medevac-line-field input,
+.medevac-line-field textarea,
+.medevac-bottom-row input,
+.medevac-bottom-row select {
+  min-height: 42px !important;
+  font-size: 15px !important;
+}
+
+.medevac-line-field textarea {
+  min-height: 76px !important;
+}
+
+/* Callsign / Ship / Priority row */
+.medevac-bottom-row {
+  grid-template-columns: 1fr 1fr 1.05fr !important;
+}
+
+.medevac-bottom-row span,
+.priority-group > span {
+  font-size: 11px !important;
+}
+
+/* Priority buttons with clear color coding */
+.priority-button {
+  position: relative;
+  min-height: 46px !important;
+  display: grid !important;
+  place-items: center !important;
+  padding-left: 20px !important;
+  font-size: 13px !important;
+}
+
+.priority-button::before {
+  content: '';
+  position: absolute;
+  left: 12px;
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+}
+
+/* Routine */
+.priority-button:nth-child(1)::before {
+  background: #18d6a3;
+  box-shadow: 0 0 10px rgba(24, 214, 163, 0.5);
+}
+
+.priority-button:nth-child(1).active {
+  border-color: rgba(24, 214, 163, 0.65) !important;
+  background: rgba(24, 214, 163, 0.16) !important;
+  color: #b8ffe9 !important;
+}
+
+/* Priority */
+.priority-button:nth-child(2)::before {
+  background: #fb923c;
+  box-shadow: 0 0 10px rgba(251, 146, 60, 0.5);
+}
+
+.priority-button:nth-child(2).active {
+  border-color: rgba(251, 146, 60, 0.75) !important;
+  background: rgba(251, 146, 60, 0.16) !important;
+  color: #fed7aa !important;
+}
+
+/* Urgent */
+.priority-button:nth-child(3)::before {
+  background: #ef4444;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+}
+
+.priority-button:nth-child(3).active {
+  border-color: rgba(239, 68, 68, 0.8) !important;
+  background: rgba(239, 68, 68, 0.18) !important;
+  color: #fecaca !important;
+}
+
+/* MEDEVAC buttons */
+.medevac-primary-action {
+  width: 360px !important;
+  border-color: rgba(56, 189, 248, 0.5) !important;
+  background: rgba(56, 189, 248, 0.14) !important;
+  color: #7dd3fc !important;
+}
+
+.medevac-secondary-action {
+  width: 110px !important;
+}
+
+/* Report preview readability */
+.medevac-preview-box pre {
+  font-size: 15px !important;
+  line-height: 1.55 !important;
+}
+
+/* Keep smaller screens clean */
+@media (max-width: 1100px) {
+  .medevac-form-panel,
+  .medevac-preview-box {
+    width: calc(100% - 28px) !important;
+  }
+
+  .medevac-line-row {
+    grid-template-columns: 44px 1fr !important;
+  }
+
+  .medevac-line-field {
+    grid-column: 1 / -1 !important;
+  }
+
+  .medevac-bottom-row {
+    grid-template-columns: 1fr !important;
+  }
+}
