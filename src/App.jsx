@@ -724,8 +724,9 @@ function BedsAndRespawns({
   clearAllRespawnsForShip,
   updateShipStatus,
 }) {
-  const [viewMode, setViewMode] = useState('List View')
-  const [draftBeds, setDraftBeds] = useState({})
+const [viewMode, setViewMode] = useState('List View')
+const [draftBeds, setDraftBeds] = useState({})
+const [selectedBedId, setSelectedBedId] = useState(null)
 
   useEffect(() => {
     const nextDrafts = {}
@@ -897,6 +898,21 @@ function BedsAndRespawns({
       '📦',
     )
   }
+  function selectBedFromFloorPlan(bedId) {
+  setSelectedBedId(bedId)
+  setViewMode('List View')
+
+  setTimeout(() => {
+    const bedElement = document.getElementById(`bed-card-${bedId}`)
+
+    if (bedElement) {
+      bedElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      })
+    }
+  }, 100)
+}
   return (
     <section className="console-panel">
       <div className="panel-command-row">
@@ -988,26 +1004,34 @@ function BedsAndRespawns({
       </div>
 
       {viewMode === 'Floor Plan' ? (
-        <FloorPlan selectedShip={selectedShip} beds={beds} />
-      ) : (
-        <div className="bed-console-grid">
-          {beds.map((bed) => (
-                        <BedConsoleCard
-              key={bed.id}
-              bed={bed}
-              draft={draftBeds[bed.id]}
-              isAdminMode={isAdminMode}
-              updateDraft={updateDraft}
-              saveBedSupply={saveBedSupply}
-              updateBedStatus={updateBedStatus}
-              addRespawn={addRespawn}
-              removeRespawn={removeRespawn}
-              useMedGel={useMedGel}
-              loadIntoTank={loadIntoTank}
-              returnToBox={returnToBox}
-            />
-          ))}
-        </div>
+<FloorPlan
+  selectedShip={selectedShip}
+  beds={beds}
+  onSelectBed={selectBedFromFloorPlan}
+/>      ) : (
+        <>
+          <div className="bed-console-grid">
+            {beds.map((bed) => (
+<BedConsoleCard
+  key={bed.id}
+  bed={bed}
+  isSelected={selectedBedId === bed.id}
+                draft={draftBeds[bed.id]}
+                isAdminMode={isAdminMode}
+                updateDraft={updateDraft}
+                saveBedSupply={saveBedSupply}
+                updateBedStatus={updateBedStatus}
+                addRespawn={addRespawn}
+                removeRespawn={removeRespawn}
+                useMedGel={useMedGel}
+                loadIntoTank={loadIntoTank}
+                returnToBox={returnToBox}
+              />
+            ))}
+          </div>
+
+          <RespawnRoster selectedShip={selectedShip} beds={beds} />
+        </>
       )}
     </section>
   )
@@ -1015,6 +1039,7 @@ function BedsAndRespawns({
 
 function BedConsoleCard({
   bed,
+  isSelected,
   draft,
   isAdminMode,
   updateDraft,
@@ -1038,7 +1063,10 @@ function BedConsoleCard({
   const totalStored = canisters * medGelMax
 
   return (
-    <article className="bed-console-card">
+    <article
+  id={`bed-card-${bed.id}`}
+  className={isSelected ? 'bed-console-card selected-bed-card' : 'bed-console-card'}
+>
       <div className="bed-card-header">
         <span>{bed.bedName}</span>
 
@@ -1220,7 +1248,7 @@ function BedConsoleCard({
   )
 }
 
-function FloorPlan({ selectedShip, beds }) {
+function FloorPlan({ selectedShip, beds, onSelectBed }) {
   if (selectedShip?.id === 'idris') {
     const t3Beds = beds.filter((bed) => bed.tier.startsWith('T3')).slice(0, 4)
     const t2Bed = beds.find((bed) => bed.tier.startsWith('T2'))
@@ -1232,13 +1260,18 @@ function FloorPlan({ selectedShip, beds }) {
 
           <div className="idris-floor-grid">
             {t3Beds.map((bed) => (
-              <div className="floor-bed floor-bed-t3" key={bed.id}>
+              <button
+                type="button"
+                className="floor-bed floor-bed-t3 clickable-floor-bed"
+                key={bed.id}
+                onClick={() => onSelectBed(bed.id)}
+              >
                 <strong>{bed.bedName}</strong>
                 <span>{bed.tier}</span>
                 <small>
                   {bed.medGelCurrent}/{bed.medGelMax}
                 </small>
-              </div>
+              </button>
             ))}
           </div>
         </div>
@@ -1251,13 +1284,17 @@ function FloorPlan({ selectedShip, beds }) {
           <div className="floor-zone-title">Operating Theatre</div>
 
           {t2Bed && (
-            <div className="floor-bed floor-bed-t2">
+            <button
+              type="button"
+              className="floor-bed floor-bed-t2 clickable-floor-bed"
+              onClick={() => onSelectBed(t2Bed.id)}
+            >
               <strong>{t2Bed.bedName}</strong>
               <span>{t2Bed.tier}</span>
               <small>
                 {t2Bed.medGelCurrent}/{t2Bed.medGelMax}
               </small>
-            </div>
+            </button>
           )}
         </div>
       </div>
@@ -1270,13 +1307,18 @@ function FloorPlan({ selectedShip, beds }) {
     <div className="floor-plan">
       <div className="floor-zone floor-left">
         {beds.slice(0, halfway).map((bed) => (
-          <div className="floor-bed" key={bed.id}>
+          <button
+            type="button"
+            className="floor-bed clickable-floor-bed"
+            key={bed.id}
+            onClick={() => onSelectBed(bed.id)}
+          >
             <strong>{bed.bedName}</strong>
             <span>{bed.tier}</span>
             <small>
               {bed.medGelCurrent}/{bed.medGelMax}
             </small>
-          </div>
+          </button>
         ))}
       </div>
 
@@ -1287,19 +1329,67 @@ function FloorPlan({ selectedShip, beds }) {
 
       <div className="floor-zone floor-right">
         {beds.slice(halfway).map((bed) => (
-          <div className="floor-bed" key={bed.id}>
+          <button
+            type="button"
+            className="floor-bed clickable-floor-bed"
+            key={bed.id}
+            onClick={() => onSelectBed(bed.id)}
+          >
             <strong>{bed.bedName}</strong>
             <span>{bed.tier}</span>
             <small>
               {bed.medGelCurrent}/{bed.medGelMax}
             </small>
-          </div>
+          </button>
         ))}
       </div>
     </div>
   )
 }
 
+function RespawnRoster({ selectedShip, beds }) {
+  const rosterEntries = beds.flatMap((bed) =>
+    bed.respawns.map((name) => ({
+      id: `${bed.id}-${name}`,
+      name,
+      bedName: bed.bedName,
+      tier: bed.tier,
+      shipName: selectedShip.name,
+    })),
+  )
+
+  return (
+    <section className="respawn-roster-panel">
+      <div className="respawn-roster-header">
+        <span>Respawn Roster — {selectedShip.name}</span>
+        <small>{rosterEntries.length} active</small>
+      </div>
+
+      {rosterEntries.length === 0 ? (
+        <p className="respawn-roster-empty">
+          No active respawn imprints for this ship.
+        </p>
+      ) : (
+        <div className="respawn-roster-grid">
+          {rosterEntries.map((entry) => (
+            <div className="respawn-roster-card" key={entry.id}>
+              <span className="roster-dot"></span>
+
+              <div>
+                <strong>{entry.name}</strong>
+                <small>
+                  {entry.bedName} — {entry.tier}
+                </small>
+              </div>
+
+              <em>{entry.shipName}</em>
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
+  )
+}
 function ShipSupplies({ supplies }) {
   return (
     <section className="console-panel">

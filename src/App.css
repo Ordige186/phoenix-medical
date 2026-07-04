@@ -2204,3 +2204,111 @@ body {
     min-height: 40px;
   }
 }
+/* ================================
+   Respawn Roster — Selected Ship
+   ================================ */
+
+.respawn-roster-panel {
+  margin: 0 14px 18px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(125, 211, 252, 0.16);
+}
+
+.respawn-roster-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 10px;
+  color: #7dd3fc;
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+}
+
+.respawn-roster-header small {
+  color: #7ea3bf;
+  font-size: 10px;
+  letter-spacing: 2px;
+}
+
+.respawn-roster-empty {
+  margin: 0;
+  padding: 12px;
+  color: #55758f;
+  font-size: 12px;
+}
+
+.respawn-roster-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 8px;
+}
+
+.respawn-roster-card {
+  min-height: 48px;
+  display: grid;
+  grid-template-columns: 14px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 9px 12px;
+  border: 1px solid rgba(125, 211, 252, 0.16);
+  border-radius: 6px;
+  background: rgba(6, 14, 24, 0.76);
+}
+
+.roster-dot {
+  width: 7px;
+  height: 7px;
+  border: 1px solid #18d6a3;
+  border-radius: 999px;
+  box-shadow: 0 0 10px rgba(24, 214, 163, 0.45);
+}
+
+.respawn-roster-card strong {
+  display: block;
+  color: #dbeafe;
+  font-size: 12px;
+}
+
+.respawn-roster-card small {
+  display: block;
+  color: #7dd3fc;
+  font-size: 10px;
+}
+
+.respawn-roster-card em {
+  color: #7ea3bf;
+  font-size: 10px;
+  font-style: normal;
+  white-space: nowrap;
+}
+/* ================================
+   Clickable Floor Plan Beds
+   ================================ */
+
+.clickable-floor-bed {
+  cursor: pointer;
+  font-family: inherit;
+  border-style: solid;
+}
+
+.clickable-floor-bed:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.15);
+  box-shadow:
+    0 0 22px rgba(24, 214, 163, 0.22),
+    inset 0 0 18px rgba(255, 255, 255, 0.04);
+}
+
+.selected-bed-card {
+  border-color: rgba(239, 68, 68, 0.85) !important;
+  box-shadow:
+    0 0 0 1px rgba(239, 68, 68, 0.55),
+    0 0 28px rgba(239, 68, 68, 0.22),
+    inset 0 0 18px rgba(239, 68, 68, 0.04);
+}
+
+.selected-bed-card .bed-card-header > span {
+  color: #fecaca !important;
+}
