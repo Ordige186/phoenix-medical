@@ -1232,45 +1232,95 @@ function MedicalBedsPreview({ medicalBeds }) {
   )
 }
 function Reports({ inventoryItems, fleetShips, medicalBeds, operations }) {
+  const generatedAt = new Date().toLocaleString()
   const lowStockItems = inventoryItems.filter((item) => item.quantity <= 30)
+  const criticalStockItems = inventoryItems.filter((item) => item.quantity <= 10)
   const readyShips = fleetShips.filter((ship) => ship.status === 'Ready')
+  const offlineShips = fleetShips.filter((ship) => ship.status === 'Offline')
   const pendingOperations = operations.filter(
     (mission) => mission.status === 'Standby' || mission.status === 'Reserved',
+  )
+  const criticalOperations = operations.filter(
+    (mission) => mission.priority === 'Critical',
   )
 
   const reportText = `
 PHOENIX SQUADRON MEDICAL REPORT
+Generated: ${generatedAt}
+Report Type: Operational Readiness Summary
+Prepared By: Phoenix Medical Portal
 
+==================================================
+COMMAND SUMMARY
+==================================================
 Medical Readiness: GREEN
-Ships Ready: ${readyShips.length}
+Active Fleet Assets Ready: ${readyShips.length}
 Pending Operations: ${pendingOperations.length}
+Critical Operations: ${criticalOperations.length}
+Offline Ships: ${offlineShips.length}
+Low Stock Items: ${lowStockItems.length}
+Critical Stock Items: ${criticalStockItems.length}
 
-LOW STOCK ITEMS:
+==================================================
+LOW STOCK ITEMS
+==================================================
 ${
   lowStockItems.length > 0
     ? lowStockItems
-        .map((item) => `- ${item.item}: ${item.quantity} (${getStockLevel(item.quantity)})`)
+        .map(
+          (item) =>
+            `- ${item.item}: ${item.quantity} remaining (${getStockLevel(
+              item.quantity,
+            )})`,
+        )
         .join('\n')
-    : '- No low stock items'
+    : '- No low stock items detected.'
 }
 
-FLEET STATUS:
+==================================================
+FLEET STATUS
+==================================================
 ${fleetShips
-  .map((ship) => `- ${ship.name}: ${ship.status} / Crew: ${ship.crew}`)
-  .join('\n')}
+  .map(
+    (ship) =>
+      `- ${ship.name}
+  Role: ${ship.role}
+  Status: ${ship.status}
+  Crew: ${ship.crew}
+  Assignment: ${ship.assignment}`,
+  )
+  .join('\n\n')}
 
-NORMANDY MEDICAL BEDS:
+==================================================
+NORMANDY MEDICAL BED ASSIGNMENTS
+==================================================
 ${medicalBeds
-  .map((bed) => `- ${bed.bed} ${bed.designation}: ${bed.assignedTo} / ${bed.status}`)
-  .join('\n')}
+  .map(
+    (bed) =>
+      `- ${bed.bed} — ${bed.designation}
+  Assigned To: ${bed.assignedTo}
+  Status: ${bed.status}
+  Purpose: ${bed.purpose}`,
+  )
+  .join('\n\n')}
 
-OPERATIONS BOARD:
+==================================================
+OPERATIONS BOARD
+==================================================
 ${operations
   .map(
     (mission) =>
-      `- ${mission.operation}: ${mission.status} / ${mission.priority} / Asset: ${mission.asset}`,
+      `- ${mission.operation}
+  Type: ${mission.type}
+  Asset: ${mission.asset}
+  Status: ${mission.status}
+  Priority: ${mission.priority}`,
   )
-  .join('\n')}
+  .join('\n\n')}
+
+==================================================
+END OF REPORT
+==================================================
 `.trim()
 
   function copyReport() {
@@ -1278,17 +1328,67 @@ ${operations
     window.alert('Phoenix Medical report copied to clipboard')
   }
 
+  function printReport() {
+    window.print()
+  }
+
   return (
-    <section className="panel">
+    <section className="panel report-panel">
       <div className="panel-header">
         <div>
           <p className="eyebrow">Command Summary</p>
           <h3>Export Report</h3>
         </div>
 
-        <button className="admin-button" onClick={copyReport}>
-          Copy Report
-        </button>
+        <div className="panel-actions">
+          <button className="admin-button" onClick={copyReport}>
+            Copy Report
+          </button>
+
+          <button className="admin-button" onClick={printReport}>
+            Print / Save PDF
+          </button>
+        </div>
+      </div>
+
+      <div className="report-summary">
+        <div className="summary-item">
+          <span>Generated</span>
+          <strong>{generatedAt}</strong>
+          <p>Current browser time at report creation.</p>
+        </div>
+
+        <div className="summary-item">
+          <span>Fleet Ready</span>
+          <strong>{readyShips.length}</strong>
+          <p>
+            {readyShips.length > 0
+              ? readyShips.map((ship) => ship.name).join(', ')
+              : 'No ready fleet assets.'}
+          </p>
+        </div>
+
+        <div className="summary-item">
+          <span>Low Stock</span>
+          <strong>{lowStockItems.length}</strong>
+          <p>
+            {lowStockItems.length > 0
+              ? lowStockItems.map((item) => item.item).join(', ')
+              : 'No low-stock items.'}
+          </p>
+        </div>
+
+        <div className="summary-item">
+          <span>Critical Ops</span>
+          <strong>{criticalOperations.length}</strong>
+          <p>
+            {criticalOperations.length > 0
+              ? criticalOperations
+                  .map((mission) => mission.operation)
+                  .join(', ')
+              : 'No critical operations.'}
+          </p>
+        </div>
       </div>
 
       <pre className="report-box">{reportText}</pre>

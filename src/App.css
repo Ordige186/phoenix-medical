@@ -641,3 +641,54 @@ nav {
     grid-template-columns: 1fr;
   }
 }
+.report-panel {
+  display: grid;
+  gap: 18px;
+}
+
+.report-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(160px, 1fr));
+  gap: 16px;
+}
+
+@media (max-width: 900px) {
+  .report-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+
+  .sidebar,
+  .panel-header,
+  .report-summary {
+    display: none;
+  }
+
+  .app {
+    display: block;
+    background: white;
+  }
+
+  .main {
+    padding: 0;
+  }
+
+  .panel,
+  .report-box {
+    border: none;
+    background: white;
+    color: black;
+    box-shadow: none;
+  }
+
+  .report-box {
+    font-size: 12px;
+    padding: 0;
+  }
+}
