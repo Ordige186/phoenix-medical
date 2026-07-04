@@ -2874,3 +2874,52 @@ body {
     width: auto !important;
   }
 }
+/* ================================
+   Clean Sidebar Sections
+   ================================ */
+
+.sidebar-nav-section {
+  margin-top: 10px;
+}
+
+.console-nav {
+  display: grid;
+  gap: 0;
+}
+
+.nav-link {
+  display: grid !important;
+  grid-template-columns: 22px 1fr;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+}
+
+.nav-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #7ea3bf;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.nav-link.active .nav-icon,
+.nav-link:hover .nav-icon {
+  color: #fecaca;
+}
+
+/* Make Tools / 9-Liner feel like a comms tool */
+.nav-link .nav-icon {
+  filter: drop-shadow(0 0 4px rgba(125, 211, 252, 0.18));
+}
+
+.sidebar-section-title {
+  border-bottom: 1px solid rgba(125, 211, 252, 0.16);
+  padding-bottom: 5px;
+}
+
+/* Slightly separate command section near the bottom visually */
+.sidebar-nav-section:last-of-type {
+  padding-bottom: 12px;
+}

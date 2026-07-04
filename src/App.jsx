@@ -5,14 +5,34 @@ import phoenixLogo from './assets/phoenix-logo.png'
 const ACCESS_PIN = '186'
 const ADMIN_PIN = '186'
 
-const pages = [
-  'Beds & Respawns',
-  'Ship Supplies',
-  'Supply Issue',
-  'Medic Roster',
-  'Tools',
-  'Activity Log',
-  'Reports',
+const navSections = [
+  {
+    title: 'Operations',
+    items: [
+      { page: 'Beds & Respawns', label: 'Beds & Respawns', icon: '▣' },
+      { page: 'Ship Supplies', label: 'Ship Supplies', icon: '▤' },
+      { page: 'Supply Issue', label: 'Supply Issue', icon: '□' },
+    ],
+  },
+  {
+    title: 'Personnel',
+    items: [
+      { page: 'Medic Roster', label: 'Medic Roster', icon: '☤' },
+    ],
+  },
+  {
+    title: 'Tools',
+    items: [
+      { page: 'MEDEVAC 9-Liner', label: 'MEDEVAC 9-Liner', icon: '☎' },
+    ],
+  },
+  {
+    title: 'Command',
+    items: [
+      { page: 'Activity Log', label: 'Activity Log', icon: '◷' },
+      { page: 'Reports', label: 'Reports', icon: '✦' },
+    ],
+  },
 ]
 
 const startingShips = [
@@ -524,7 +544,7 @@ function App() {
       )
     }
 
-if (activePage === 'Tools') {
+if (activePage === 'MEDEVAC 9-Liner') {
   return <Tools addActivity={addActivity} ships={ships} />
 }
 
@@ -659,19 +679,26 @@ if (activePage === 'Tools') {
           ))}
         </div>
 
-        <div className="sidebar-section-title">Operations</div>
+        {navSections.map((section) => (
+          <div className="sidebar-nav-section" key={section.title}>
+            <div className="sidebar-section-title">{section.title}</div>
 
-        <nav className="console-nav">
-          {pages.map((page) => (
-            <button
-              key={page}
-              className={activePage === page ? 'nav-link active' : 'nav-link'}
-              onClick={() => setActivePage(page)}
-            >
-              {page}
-            </button>
-          ))}
-        </nav>
+            <nav className="console-nav">
+              {section.items.map((item) => (
+                <button
+                  key={item.page}
+                  className={
+                    activePage === item.page ? 'nav-link active' : 'nav-link'
+                  }
+                  onClick={() => setActivePage(item.page)}
+                >
+                  <span className="nav-icon">{item.icon}</span>
+                  <span>{item.label}</span>
+                </button>
+              ))}
+            </nav>
+          </div>
+        ))}
 
         <div className="sidebar-bottom">
           <button className="sidebar-control" onClick={toggleAdminMode}>
