@@ -12,19 +12,16 @@ const pages = [
   'Reports',
 ]
 
+const ACCESS_PIN = '186'
+const ADMIN_PIN = '186'
+
 function getStatusClass(status) {
   return `status-pill status-${status.toLowerCase().replaceAll(' ', '-')}`
 }
 
 function getStockLevel(quantity) {
-  if (quantity <= 10) {
-    return 'Critical'
-  }
-
-  if (quantity <= 30) {
-    return 'Low'
-  }
-
+  if (quantity <= 10) return 'Critical'
+  if (quantity <= 30) return 'Low'
   return 'Good'
 }
 
@@ -220,44 +217,32 @@ const startingOperations = [
 function App() {
   const [activePage, setActivePage] = useState('Dashboard')
   const [isAdminMode, setIsAdminMode] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return localStorage.getItem('phoenixAuthenticated') === 'true'
+  })
+  const [accessPin, setAccessPin] = useState('')
 
   const [inventoryItems, setInventoryItems] = useState(() => {
     const savedInventory = localStorage.getItem('phoenixInventory')
-
-    if (savedInventory) {
-      return JSON.parse(savedInventory)
-    }
-
+    if (savedInventory) return JSON.parse(savedInventory)
     return startingInventoryItems
   })
 
   const [medicalBeds, setMedicalBeds] = useState(() => {
     const savedBeds = localStorage.getItem('phoenixMedicalBeds')
-
-    if (savedBeds) {
-      return JSON.parse(savedBeds)
-    }
-
+    if (savedBeds) return JSON.parse(savedBeds)
     return startingMedicalBeds
   })
 
   const [fleetShips, setFleetShips] = useState(() => {
     const savedFleet = localStorage.getItem('phoenixFleet')
-
-    if (savedFleet) {
-      return JSON.parse(savedFleet)
-    }
-
+    if (savedFleet) return JSON.parse(savedFleet)
     return startingFleetShips
   })
 
   const [operations, setOperations] = useState(() => {
     const savedOperations = localStorage.getItem('phoenixOperations')
-
-    if (savedOperations) {
-      return JSON.parse(savedOperations)
-    }
-
+    if (savedOperations) return JSON.parse(savedOperations)
     return startingOperations
   })
 
@@ -287,6 +272,24 @@ function App() {
     (mission) => mission.status === 'Standby' || mission.status === 'Reserved',
   ).length
 
+  function authenticatePortal(event) {
+    event.preventDefault()
+
+    if (accessPin === ACCESS_PIN) {
+      localStorage.setItem('phoenixAuthenticated', 'true')
+      setIsAuthenticated(true)
+      setAccessPin('')
+    } else {
+      window.alert('Incorrect access PIN')
+    }
+  }
+
+  function logoutPortal() {
+    localStorage.removeItem('phoenixAuthenticated')
+    setIsAuthenticated(false)
+    setIsAdminMode(false)
+  }
+
   function toggleAdminMode() {
     if (isAdminMode) {
       setIsAdminMode(false)
@@ -295,11 +298,124 @@ function App() {
 
     const pin = window.prompt('Enter Phoenix Medical admin PIN')
 
-    if (pin === '186') {
+    if (pin === ADMIN_PIN) {
       setIsAdminMode(true)
     } else if (pin !== null) {
       window.alert('Incorrect admin PIN')
     }
+  }
+
+  function renderPage() {
+    if (activePage === 'Dashboard') {
+      return (
+        <Dashboard
+          activePersonnel={activePersonnel}
+          shipsReady={shipsReady}
+          pendingRequests={pendingRequests}
+          inventoryItems={inventoryItems}
+          fleetShips={fleetShips}
+          medicalBeds={medicalBeds}
+          operations={operations}
+        />
+      )
+    }
+
+    if (activePage === 'Personnel') {
+      return <Personnel />
+    }
+
+    if (activePage === 'Fleet') {
+      return (
+        <Fleet
+          fleetShips={fleetShips}
+          setFleetShips={setFleetShips}
+          isAdminMode={isAdminMode}
+        />
+      )
+    }
+
+    if (activePage === 'Inventory') {
+      return (
+        <Inventory
+          inventoryItems={inventoryItems}
+          setInventoryItems={setInventoryItems}
+          isAdminMode={isAdminMode}
+        />
+      )
+    }
+
+    if (activePage === 'Medical Beds') {
+      return (
+        <MedicalBeds
+          medicalBeds={medicalBeds}
+          setMedicalBeds={setMedicalBeds}
+          isAdminMode={isAdminMode}
+        />
+      )
+    }
+
+    if (activePage === 'Operations') {
+      return (
+        <Operations
+          operations={operations}
+          setOperations={setOperations}
+          isAdminMode={isAdminMode}
+        />
+      )
+    }
+
+    if (activePage === 'Reports') {
+      return (
+        <Reports
+          inventoryItems={inventoryItems}
+          fleetShips={fleetShips}
+          medicalBeds={medicalBeds}
+          operations={operations}
+        />
+      )
+    }
+
+    return null
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="login-screen">
+        <div className="login-card">
+          <img
+            className="login-logo"
+            src={phoenixLogo}
+            alt="Phoenix Squadron Medical logo"
+          />
+
+          <p className="eyebrow">Restricted Medical System</p>
+          <h1>Phoenix Squadron Medical</h1>
+
+          <p className="login-subtitle">
+            Authenticate to access fleet medical readiness, inventory,
+            operations, and Normandy bed assignments.
+          </p>
+
+          <form className="login-form" onSubmit={authenticatePortal}>
+            <input
+              type="password"
+              placeholder="Enter access PIN"
+              value={accessPin}
+              onChange={(event) => setAccessPin(event.target.value)}
+            />
+
+            <button className="admin-button" type="submit">
+              Authenticate
+            </button>
+          </form>
+
+          <div className="login-footer">
+            <span>CLASSIFICATION: RESTRICTED</span>
+            <span>PHOENIX MEDICAL COMMAND</span>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -307,15 +423,20 @@ function App() {
       <aside className="sidebar">
         <div className="brand">
           <img
-  className="logo-image"
-  src={phoenixLogo}
-  alt="Phoenix Squadron Medical logo"
-/>
+            className="logo-image"
+            src={phoenixLogo}
+            alt="Phoenix Squadron Medical logo"
+          />
+
           <div>
-            <h1>PHOENIX</h1>
-            <p>Squadron Medical</p>
+            <h1>Phoenix Medical</h1>
+            <p>Rapid Response Command</p>
           </div>
         </div>
+
+        <button className="mode-button" onClick={toggleAdminMode}>
+          {isAdminMode ? 'Admin Mode' : 'View Mode'}
+        </button>
 
         <nav>
           {pages.map((page) => (
@@ -328,80 +449,18 @@ function App() {
             </button>
           ))}
         </nav>
-
-        <div className="admin-toggle">
-          <p>Access Mode</p>
-          <button
-            className={isAdminMode ? 'mode-button active' : 'mode-button'}
-            onClick={toggleAdminMode}
-          >
-            {isAdminMode ? 'Admin Mode' : 'View Mode'}
-          </button>
-        </div>
       </aside>
 
-      <main className="main">
-        {activePage === 'Dashboard' && (
-         <Dashboard
-  activePersonnel={activePersonnel}
-  shipsReady={shipsReady}
-  pendingRequests={pendingRequests}
-  medicalBeds={medicalBeds}
-  inventoryItems={inventoryItems}
-  fleetShips={fleetShips}
-  operations={operations}
-/>
-        )}
-
-        {activePage === 'Personnel' && <Personnel />}
-
-        {activePage === 'Fleet' && (
-          <Fleet
-            fleetShips={fleetShips}
-            setFleetShips={setFleetShips}
-            isAdminMode={isAdminMode}
-          />
-        )}
-
-        {activePage === 'Inventory' && (
-          <Inventory
-            inventoryItems={inventoryItems}
-            setInventoryItems={setInventoryItems}
-            resetInventory={() => setInventoryItems(startingInventoryItems)}
-            isAdminMode={isAdminMode}
-          />
-        )}
-
-        {activePage === 'Medical Beds' && (
-          <MedicalBeds
-            medicalBeds={medicalBeds}
-            setMedicalBeds={setMedicalBeds}
-            isAdminMode={isAdminMode}
-          />
-        )}
-
-        {activePage === 'Operations' && (
-          <Operations
-            operations={operations}
-            setOperations={setOperations}
-            isAdminMode={isAdminMode}
-          />
-        )}
-        {activePage === 'Reports' && (
-  <Reports
-    inventoryItems={inventoryItems}
-    fleetShips={fleetShips}
-    medicalBeds={medicalBeds}
-    operations={operations}
-  />
-)}
-        </main>
+      <main className="main">{renderPage()}</main>
 
       <div className="system-bar">
         <span>Phoenix Squadron Medical Portal</span>
         <span>Mode: {isAdminMode ? 'Admin' : 'View'}</span>
         <span>System: Online</span>
         <span>Last Updated: {new Date().toLocaleTimeString()}</span>
+        <button className="system-link" onClick={logoutPortal}>
+          Logout
+        </button>
       </div>
     </div>
   )
@@ -411,144 +470,123 @@ function Dashboard({
   activePersonnel,
   shipsReady,
   pendingRequests,
-  medicalBeds,
   inventoryItems,
   fleetShips,
+  medicalBeds,
   operations,
 }) {
   const lowStockItems = inventoryItems.filter((item) => item.quantity <= 30)
-const offlineShips = fleetShips.filter((ship) => ship.status === 'Offline')
-const criticalOperations = operations.filter(
-  (mission) => mission.priority === 'Critical',
-)
-const reservedBeds = medicalBeds.filter(
-  (bed) => bed.status === 'Reserved' || bed.status === 'Occupied',
-)
+  const offlineShips = fleetShips.filter((ship) => ship.status === 'Offline')
+  const criticalOperations = operations.filter(
+    (mission) => mission.priority === 'Critical',
+  )
+  const activeBeds = medicalBeds.filter(
+    (bed) => bed.status === 'Occupied' || bed.status === 'Reserved',
+  )
 
   return (
     <>
       <section className="hero hero-with-logo">
-  <div className="hero-text">
-    <p className="eyebrow">Rapid Medical Response Command</p>
-    <h2>Phoenix Squadron Medical Portal</h2>
-            <p>
-      Operational dashboard for medical readiness, assigned beds, fleet
-      status, and field response coordination.
-    </p>
-  </div>
+        <div className="hero-text">
+          <p className="eyebrow">Rapid Medical Response Command</p>
+          <h2>Phoenix Squadron Medical Portal</h2>
+          <p>
+            Operational dashboard for medical readiness, assigned beds, fleet
+            status, and field response coordination.
+          </p>
+        </div>
 
-  <img
-    className="hero-logo"
-    src={phoenixLogo}
-    alt="Phoenix Squadron Medical logo"
-  />
-</section>
+        <img
+          className="hero-logo"
+          src={phoenixLogo}
+          alt="Phoenix Squadron Medical logo"
+        />
+      </section>
 
       <section className="status-grid">
-        <div className="card green">
-          <p>Medical Readiness</p>
+        <div className="card">
+          <span>Medical Readiness</span>
           <h3>GREEN</h3>
+          <p>All core medical systems are online.</p>
         </div>
 
         <div className="card">
-          <p>Active Personnel</p>
+          <span>Active Personnel</span>
           <h3>{activePersonnel}</h3>
+          <p>Available medical personnel currently listed as active.</p>
         </div>
 
         <div className="card">
-          <p>Ships Ready</p>
+          <span>Ships Ready</span>
           <h3>{shipsReady}</h3>
+          <p>Medical fleet assets marked ready for deployment.</p>
         </div>
 
-        <div className="card amber">
-          <p>Pending Operations</p>
+        <div className="card">
+          <span>Pending Operations</span>
           <h3>{pendingRequests}</h3>
+          <p>Operations currently standing by or reserved.</p>
         </div>
       </section>
-<section className="panel">
-  <div className="panel-header">
-    <div>
-      <p className="eyebrow">System Check</p>
-      <h3>Readiness Summary</h3>
-    </div>
-    <span className="tag">Auto Scan</span>
-  </div>
 
-  <div className="summary-grid">
-    <div className="summary-item">
-      <span>Low Stock</span>
-      <strong>{lowStockItems.length}</strong>
-      <p>
-        {lowStockItems.length > 0
-          ? lowStockItems.map((item) => item.item).join(', ')
-          : 'No low-stock items detected.'}
-      </p>
-    </div>
+      <section className="summary-grid">
+        <div className="summary-item">
+          <span>Low Stock</span>
+          <strong>{lowStockItems.length}</strong>
+          <p>
+            {lowStockItems.length > 0
+              ? lowStockItems.map((item) => item.item).join(', ')
+              : 'No supply warnings detected.'}
+          </p>
+        </div>
 
-    <div className="summary-item">
-      <span>Offline Ships</span>
-      <strong>{offlineShips.length}</strong>
-      <p>
-        {offlineShips.length > 0
-          ? offlineShips.map((ship) => ship.name).join(', ')
-          : 'All fleet assets reporting available.'}
-      </p>
-    </div>
+        <div className="summary-item">
+          <span>Offline Ships</span>
+          <strong>{offlineShips.length}</strong>
+          <p>
+            {offlineShips.length > 0
+              ? offlineShips.map((ship) => ship.name).join(', ')
+              : 'No offline ships reported.'}
+          </p>
+        </div>
 
-    <div className="summary-item">
-      <span>Critical Operations</span>
-      <strong>{criticalOperations.length}</strong>
-      <p>
-        {criticalOperations.length > 0
-          ? criticalOperations.map((mission) => mission.operation).join(', ')
-          : 'No critical operations active.'}
-      </p>
-    </div>
+        <div className="summary-item">
+          <span>Critical Operations</span>
+          <strong>{criticalOperations.length}</strong>
+          <p>
+            {criticalOperations.length > 0
+              ? criticalOperations
+                  .map((mission) => mission.operation)
+                  .join(', ')
+              : 'No critical operations active.'}
+          </p>
+        </div>
 
-    <div className="summary-item">
-      <span>Reserved / Occupied Beds</span>
-      <strong>{reservedBeds.length}</strong>
-      <p>
-        {reservedBeds.length > 0
-          ? reservedBeds.map((bed) => bed.bed).join(', ')
-          : 'No restricted beds detected.'}
-      </p>
-    </div>
-  </div>
-</section>
-
-      <MedicalBedsPreview medicalBeds={medicalBeds} />
+        <div className="summary-item">
+          <span>Reserved / Occupied Beds</span>
+          <strong>{activeBeds.length}</strong>
+          <p>
+            {activeBeds.length > 0
+              ? activeBeds.map((bed) => bed.bed).join(', ')
+              : 'Medical beds are clear.'}
+          </p>
+        </div>
+      </section>
     </>
   )
 }
 
 function Personnel() {
-  const [searchTerm, setSearchTerm] = useState('')
-
-  const filteredPersonnel = personnelRoster.filter((member) => {
-    const searchableText =
-      `${member.name} ${member.callsign} ${member.role} ${member.certifications} ${member.status}`.toLowerCase()
-
-    return searchableText.includes(searchTerm.toLowerCase())
-  })
-
   return (
     <section className="panel">
       <div className="panel-header">
         <div>
-          <p className="eyebrow">Roster</p>
-          <h3>Medical Personnel</h3>
+          <p className="eyebrow">Medical Roster</p>
+          <h3>Personnel</h3>
         </div>
-        <span className="tag">Active</span>
-      </div>
 
-      <input
-        className="search-box"
-        type="text"
-        placeholder="Search personnel..."
-        value={searchTerm}
-        onChange={(event) => setSearchTerm(event.target.value)}
-      />
+        <span className="tag">Read Only</span>
+      </div>
 
       <div className="table">
         <div className="table-row table-head">
@@ -558,8 +596,8 @@ function Personnel() {
           <span>Status</span>
         </div>
 
-        {filteredPersonnel.map((member) => (
-          <div className="table-row" key={member.name}>
+        {personnelRoster.map((member) => (
+          <div className="table-row" key={member.callsign}>
             <span>{member.name}</span>
             <span>{member.callsign}</span>
             <span>{member.role}</span>
@@ -574,27 +612,12 @@ function Personnel() {
 }
 
 function Fleet({ fleetShips, setFleetShips, isAdminMode }) {
-  function updateShipStatus(shipName, newStatus) {
-    const updatedFleet = fleetShips.map((ship) => {
-      if (ship.name === shipName) {
+  function updateFleetShip(index, field, value) {
+    const updatedFleet = fleetShips.map((ship, shipIndex) => {
+      if (shipIndex === index) {
         return {
           ...ship,
-          status: newStatus,
-        }
-      }
-
-      return ship
-    })
-
-    setFleetShips(updatedFleet)
-  }
-
-  function updateShipCrew(shipName, newCrew) {
-    const updatedFleet = fleetShips.map((ship) => {
-      if (ship.name === shipName) {
-        return {
-          ...ship,
-          crew: newCrew,
+          [field]: value,
         }
       }
 
@@ -613,7 +636,7 @@ function Fleet({ fleetShips, setFleetShips, isAdminMode }) {
       <div className="panel-header">
         <div>
           <p className="eyebrow">Medical Fleet</p>
-          <h3>Ship Readiness</h3>
+          <h3>Fleet Status</h3>
         </div>
 
         <div className="panel-actions">
@@ -622,56 +645,56 @@ function Fleet({ fleetShips, setFleetShips, isAdminMode }) {
               Reset Fleet
             </button>
           )}
+
           <span className="tag">{isAdminMode ? 'Admin Mode' : 'View Mode'}</span>
         </div>
       </div>
 
-      <div className="bed-grid">
-        {fleetShips.map((ship) => (
-          <div className="bed-card" key={ship.name}>
-            <span>{ship.name}</span>
-            <strong>{ship.role}</strong>
+      <div className="table">
+        <div className="table-row table-head">
+          <span>Ship</span>
+          <span>Role</span>
+          <span>Assignment</span>
+          <span>Status</span>
+        </div>
 
-            {isAdminMode ? (
-              <>
-                <label className="field-label">Status</label>
+        {fleetShips.map((ship, index) => (
+          <div className="table-row" key={ship.name}>
+            <span>{ship.name}</span>
+            <span>{ship.role}</span>
+            <span>
+              {isAdminMode ? (
+                <input
+                  className="inline-input"
+                  value={ship.assignment}
+                  onChange={(event) =>
+                    updateFleetShip(index, 'assignment', event.target.value)
+                  }
+                />
+              ) : (
+                ship.assignment
+              )}
+            </span>
+            <span>
+              {isAdminMode ? (
                 <select
                   className={`status-select ${getStatusClass(ship.status)}`}
                   value={ship.status}
                   onChange={(event) =>
-                    updateShipStatus(ship.name, event.target.value)
+                    updateFleetShip(index, 'status', event.target.value)
                   }
                 >
                   <option>Ready</option>
                   <option>Standby</option>
                   <option>Reserved</option>
-                  <option>Occupied</option>
                   <option>Offline</option>
                 </select>
-
-                <label className="field-label">Crew</label>
-                <input
-                  className="inline-input"
-                  type="text"
-                  value={ship.crew}
-                  onChange={(event) =>
-                    updateShipCrew(ship.name, event.target.value)
-                  }
-                />
-              </>
-            ) : (
-              <>
-                <p>
-                  Status:{' '}
-                  <span className={getStatusClass(ship.status)}>
-                    {ship.status}
-                  </span>
-                </p>
-                <p>Crew: {ship.crew}</p>
-              </>
-            )}
-
-            <p>Assignment: {ship.assignment}</p>
+              ) : (
+                <span className={getStatusClass(ship.status)}>
+                  {ship.status}
+                </span>
+              )}
+            </span>
           </div>
         ))}
       </div>
@@ -679,93 +702,83 @@ function Fleet({ fleetShips, setFleetShips, isAdminMode }) {
   )
 }
 
-function Inventory({
-  inventoryItems,
-  setInventoryItems,
-  resetInventory,
-  isAdminMode,
-}) {
+function Inventory({ inventoryItems, setInventoryItems, isAdminMode }) {
   const [searchTerm, setSearchTerm] = useState('')
   const [newItem, setNewItem] = useState('')
-  const [newCategory, setNewCategory] = useState('')
+  const [newCategory, setNewCategory] = useState('Medical Supply')
   const [newQuantity, setNewQuantity] = useState('')
-  const [newStatus, setNewStatus] = useState('Ready')
 
-  const filteredItems = inventoryItems.filter((supply) => {
-    const searchableText =
-      `${supply.item} ${supply.category} ${supply.status}`.toLowerCase()
+  const filteredItems = inventoryItems.filter((item) => {
+    const searchText = `${item.item} ${item.category} ${item.status}`
+      .toLowerCase()
+      .trim()
 
-    return searchableText.includes(searchTerm.toLowerCase())
+    return searchText.includes(searchTerm.toLowerCase())
   })
 
   function updateQuantity(itemName, amount) {
-    const updatedInventory = inventoryItems.map((supply) => {
-      if (supply.item === itemName) {
-        const newQuantityValue = Math.max(0, supply.quantity + amount)
-
+    const updatedItems = inventoryItems.map((item) => {
+      if (item.item === itemName) {
         return {
-          ...supply,
-          quantity: newQuantityValue,
+          ...item,
+          quantity: Math.max(0, item.quantity + amount),
         }
       }
 
-      return supply
+      return item
     })
 
-    setInventoryItems(updatedInventory)
+    setInventoryItems(updatedItems)
+  }
+
+  function updateStatus(itemName, newStatus) {
+    const updatedItems = inventoryItems.map((item) => {
+      if (item.item === itemName) {
+        return {
+          ...item,
+          status: newStatus,
+        }
+      }
+
+      return item
+    })
+
+    setInventoryItems(updatedItems)
   }
 
   function addInventoryItem(event) {
     event.preventDefault()
 
-    if (!newItem || !newCategory || !newQuantity) {
-      return
-    }
+    if (!newItem.trim() || !newQuantity) return
 
-    const itemToAdd = {
-      item: newItem,
+    const addedItem = {
+      item: newItem.trim(),
       category: newCategory,
       quantity: Number(newQuantity),
-      status: newStatus,
+      status: 'In Stock',
     }
 
-    setInventoryItems([...inventoryItems, itemToAdd])
-
+    setInventoryItems([...inventoryItems, addedItem])
     setNewItem('')
-    setNewCategory('')
+    setNewCategory('Medical Supply')
     setNewQuantity('')
-    setNewStatus('Ready')
   }
 
   function deleteInventoryItem(itemName) {
-    const updatedInventory = inventoryItems.filter((supply) => {
-      return supply.item !== itemName
-    })
-
-    setInventoryItems(updatedInventory)
+    const updatedItems = inventoryItems.filter((item) => item.item !== itemName)
+    setInventoryItems(updatedItems)
   }
 
-  function updateItemStatus(itemName, newStatus) {
-    const updatedInventory = inventoryItems.map((supply) => {
-      if (supply.item === itemName) {
-        return {
-          ...supply,
-          status: newStatus,
-        }
-      }
-
-      return supply
-    })
-
-    setInventoryItems(updatedInventory)
+  function resetInventory() {
+    setInventoryItems(startingInventoryItems)
   }
 
   return (
     <section className="panel">
       <div className="panel-header">
         <div>
-          <p className="eyebrow">Medical Logistics</p>
-          <h3>Inventory</h3>
+          <p className="eyebrow">Medical Supply</p>
+          <h3>Inventory Control</h3>
         </div>
 
         <div className="panel-actions">
@@ -774,44 +787,42 @@ function Inventory({
               Reset Inventory
             </button>
           )}
+
           <span className="tag">{isAdminMode ? 'Admin Mode' : 'View Mode'}</span>
         </div>
       </div>
 
+      <input
+        className="search-box"
+        placeholder="Search inventory..."
+        value={searchTerm}
+        onChange={(event) => setSearchTerm(event.target.value)}
+      />
+
       {isAdminMode && (
         <form className="admin-form" onSubmit={addInventoryItem}>
           <input
-            type="text"
             placeholder="Item name"
             value={newItem}
             onChange={(event) => setNewItem(event.target.value)}
           />
 
-          <input
-            type="text"
-            placeholder="Category"
+          <select
             value={newCategory}
             onChange={(event) => setNewCategory(event.target.value)}
-          />
+          >
+            <option>Medical Supply</option>
+            <option>Medication</option>
+            <option>Medical Tool</option>
+            <option>Rescue Equipment</option>
+          </select>
 
           <input
             type="number"
             placeholder="Quantity"
-            min="0"
             value={newQuantity}
             onChange={(event) => setNewQuantity(event.target.value)}
           />
-
-          <select
-            value={newStatus}
-            onChange={(event) => setNewStatus(event.target.value)}
-          >
-            <option>Ready</option>
-            <option>In Stock</option>
-            <option>Monitor</option>
-            <option>Reserved</option>
-            <option>Open</option>
-          </select>
 
           <button className="admin-button" type="submit">
             Add Item
@@ -819,83 +830,77 @@ function Inventory({
         </form>
       )}
 
-      <input
-        className="search-box"
-        type="text"
-        placeholder="Search inventory..."
-        value={searchTerm}
-        onChange={(event) => setSearchTerm(event.target.value)}
-      />
-
       <div
         className={
-          isAdminMode ? 'table inventory-table' : 'table inventory-table view-only'
+          isAdminMode
+            ? 'table inventory-table'
+            : 'table inventory-table view-only'
         }
       >
         <div className="table-row table-head">
           <span>Item</span>
           <span>Category</span>
-          <span>Quantity</span>
-          <span>Stock Level</span>
+          <span>Qty</span>
           <span>Status</span>
-          {isAdminMode && <span>Controls</span>}
+          <span>Stock</span>
+          {isAdminMode && <span>Actions</span>}
         </div>
 
-        {filteredItems.map((supply) => (
-          <div className="table-row" key={supply.item}>
-            <span>{supply.item}</span>
-            <span>{supply.category}</span>
-            <span>{supply.quantity}</span>
-
+        {filteredItems.map((item) => (
+          <div className="table-row" key={item.item}>
+            <span>{item.item}</span>
+            <span>{item.category}</span>
+            <span>{item.quantity}</span>
+            <span>
+              {isAdminMode ? (
+                <select
+                  className={`status-select ${getStatusClass(item.status)}`}
+                  value={item.status}
+                  onChange={(event) =>
+                    updateStatus(item.item, event.target.value)
+                  }
+                >
+                  <option>Ready</option>
+                  <option>In Stock</option>
+                  <option>Monitor</option>
+                  <option>Reserved</option>
+                  <option>Offline</option>
+                </select>
+              ) : (
+                <span className={getStatusClass(item.status)}>
+                  {item.status}
+                </span>
+              )}
+            </span>
             <span
               className={`stock-pill stock-${getStockLevel(
-                supply.quantity,
+                item.quantity,
               ).toLowerCase()}`}
             >
-              {getStockLevel(supply.quantity)}
+              {getStockLevel(item.quantity)}
             </span>
-
-            {isAdminMode ? (
-              <select
-                className={`status-select ${getStatusClass(supply.status)}`}
-                value={supply.status}
-                onChange={(event) =>
-                  updateItemStatus(supply.item, event.target.value)
-                }
-              >
-                <option>Ready</option>
-                <option>In Stock</option>
-                <option>Monitor</option>
-                <option>Reserved</option>
-                <option>Open</option>
-              </select>
-            ) : (
-              <span className={getStatusClass(supply.status)}>
-                {supply.status}
-              </span>
-            )}
 
             {isAdminMode && (
               <span className="control-group">
                 <button
                   className="small-button"
-                  onClick={() => updateQuantity(supply.item, -1)}
+                  onClick={() => updateQuantity(item.item, -1)}
                 >
                   -
                 </button>
 
                 <button
                   className="small-button"
-                  onClick={() => updateQuantity(supply.item, 1)}
+                  onClick={() => updateQuantity(item.item, 1)}
                 >
                   +
                 </button>
 
                 <button
                   className="small-button danger"
-                  onClick={() => deleteInventoryItem(supply.item)}
+                  onClick={() => deleteInventoryItem(item.item)}
                 >
-                  ×
+                  Delete
                 </button>
               </span>
             )}
@@ -907,12 +912,29 @@ function Inventory({
 }
 
 function MedicalBeds({ medicalBeds, setMedicalBeds, isAdminMode }) {
-  function updateBedAssignment(bedName, newAssignment) {
+  const [draftAssignments, setDraftAssignments] = useState(() => {
+    const startingDrafts = {}
+
+    medicalBeds.forEach((bed) => {
+      startingDrafts[bed.bed] = bed.assignedTo
+    })
+
+    return startingDrafts
+  })
+
+  function updateDraftAssignment(bedName, newAssignment) {
+    setDraftAssignments({
+      ...draftAssignments,
+      [bedName]: newAssignment,
+    })
+  }
+
+  function saveBedAssignment(bedName) {
     const updatedBeds = medicalBeds.map((bed) => {
       if (bed.bed === bedName) {
         return {
           ...bed,
-          assignedTo: newAssignment,
+          assignedTo: draftAssignments[bedName] || 'Unassigned',
         }
       }
 
@@ -939,6 +961,14 @@ function MedicalBeds({ medicalBeds, setMedicalBeds, isAdminMode }) {
 
   function resetBeds() {
     setMedicalBeds(startingMedicalBeds)
+
+    const resetDrafts = {}
+
+    startingMedicalBeds.forEach((bed) => {
+      resetDrafts[bed.bed] = bed.assignedTo
+    })
+
+    setDraftAssignments(resetDrafts)
   }
 
   return (
@@ -955,6 +985,7 @@ function MedicalBeds({ medicalBeds, setMedicalBeds, isAdminMode }) {
               Reset Beds
             </button>
           )}
+
           <span className="tag">{isAdminMode ? 'Admin Mode' : 'View Mode'}</span>
         </div>
       </div>
@@ -968,16 +999,33 @@ function MedicalBeds({ medicalBeds, setMedicalBeds, isAdminMode }) {
             {isAdminMode ? (
               <>
                 <label className="field-label">Assigned To</label>
-                <input
-                  className="inline-input"
-                  type="text"
-                  value={bed.assignedTo}
-                  onChange={(event) =>
-                    updateBedAssignment(bed.bed, event.target.value)
-                  }
-                />
+
+                <div className="assign-row">
+                  <input
+                    className="inline-input"
+                    type="text"
+                    value={draftAssignments[bed.bed] || ''}
+                    placeholder="Type name / callsign"
+                    onChange={(event) =>
+                      updateDraftAssignment(bed.bed, event.target.value)
+                    }
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter') {
+                        saveBedAssignment(bed.bed)
+                      }
+                    }}
+                  />
+
+                  <button
+                    className="small-button save-button"
+                    onClick={() => saveBedAssignment(bed.bed)}
+                  >
+                    ✓
+                  </button>
+                </div>
 
                 <label className="field-label">Status</label>
+
                 <select
                   className={`status-select ${getStatusClass(bed.status)}`}
                   value={bed.status}
@@ -1014,69 +1062,49 @@ function MedicalBeds({ medicalBeds, setMedicalBeds, isAdminMode }) {
 
 function Operations({ operations, setOperations, isAdminMode }) {
   const [newOperation, setNewOperation] = useState('')
-  const [newType, setNewType] = useState('')
-  const [newAsset, setNewAsset] = useState('')
-  const [newStatus, setNewStatus] = useState('Standby')
+  const [newType, setNewType] = useState('Medical Overwatch')
+  const [newAsset, setNewAsset] = useState('Normandy')
   const [newPriority, setNewPriority] = useState('Normal')
+
+  function updateOperation(index, field, value) {
+    const updatedOperations = operations.map((mission, missionIndex) => {
+      if (missionIndex === index) {
+        return {
+          ...mission,
+          [field]: value,
+        }
+      }
+
+      return mission
+    })
+
+    setOperations(updatedOperations)
+  }
 
   function addOperation(event) {
     event.preventDefault()
 
-    if (!newOperation || !newType || !newAsset) {
-      return
-    }
+    if (!newOperation.trim()) return
 
-    const operationToAdd = {
-      operation: newOperation,
+    const addedOperation = {
+      operation: newOperation.trim(),
       type: newType,
       asset: newAsset,
-      status: newStatus,
+      status: 'Standby',
       priority: newPriority,
     }
 
-    setOperations([...operations, operationToAdd])
-
+    setOperations([...operations, addedOperation])
     setNewOperation('')
-    setNewType('')
-    setNewAsset('')
-    setNewStatus('Standby')
+    setNewType('Medical Overwatch')
+    setNewAsset('Normandy')
     setNewPriority('Normal')
   }
 
-  function updateOperationStatus(operationName, newStatusValue) {
-    const updatedOperations = operations.map((mission) => {
-      if (mission.operation === operationName) {
-        return {
-          ...mission,
-          status: newStatusValue,
-        }
-      }
-
-      return mission
-    })
-
-    setOperations(updatedOperations)
-  }
-
-  function updateOperationPriority(operationName, newPriorityValue) {
-    const updatedOperations = operations.map((mission) => {
-      if (mission.operation === operationName) {
-        return {
-          ...mission,
-          priority: newPriorityValue,
-        }
-      }
-
-      return mission
-    })
-
-    setOperations(updatedOperations)
-  }
-
   function deleteOperation(operationName) {
-    const updatedOperations = operations.filter((mission) => {
-      return mission.operation !== operationName
-    })
+    const updatedOperations = operations.filter(
+      (mission) => mission.operation !== operationName,
+    )
 
     setOperations(updatedOperations)
   }
@@ -1089,8 +1117,8 @@ function Operations({ operations, setOperations, isAdminMode }) {
     <section className="panel">
       <div className="panel-header">
         <div>
-          <p className="eyebrow">Command Operations</p>
-          <h3>Mission Board</h3>
+          <p className="eyebrow">Mission Board</p>
+          <h3>Operations</h3>
         </div>
 
         <div className="panel-actions">
@@ -1099,6 +1127,7 @@ function Operations({ operations, setOperations, isAdminMode }) {
               Reset Operations
             </button>
           )}
+
           <span className="tag">{isAdminMode ? 'Admin Mode' : 'View Mode'}</span>
         </div>
       </div>
@@ -1106,35 +1135,31 @@ function Operations({ operations, setOperations, isAdminMode }) {
       {isAdminMode && (
         <form className="admin-form operations-form" onSubmit={addOperation}>
           <input
-            type="text"
             placeholder="Operation name"
             value={newOperation}
             onChange={(event) => setNewOperation(event.target.value)}
           />
 
-          <input
-            type="text"
-            placeholder="Type"
+          <select
             value={newType}
             onChange={(event) => setNewType(event.target.value)}
-          />
-
-          <input
-            type="text"
-            placeholder="Assigned asset"
-            value={newAsset}
-            onChange={(event) => setNewAsset(event.target.value)}
-          />
+          >
+            <option>Medical Overwatch</option>
+            <option>Search and Rescue</option>
+            <option>QRF</option>
+            <option>Mass Casualty</option>
+            <option>Training</option>
+          </select>
 
           <select
-            value={newStatus}
-            onChange={(event) => setNewStatus(event.target.value)}
+            value={newAsset}
+            onChange={(event) => setNewAsset(event.target.value)}
           >
-            <option>Ready</option>
-            <option>Standby</option>
-            <option>Reserved</option>
-            <option>Occupied</option>
-            <option>Offline</option>
+            <option>Normandy</option>
+            <option>RSI Apollo Medivac</option>
+            <option>RSI Apollo Triage</option>
+            <option>C8R Pisces Rescue</option>
+            <option>Ground Team</option>
           </select>
 
           <select
@@ -1152,105 +1177,69 @@ function Operations({ operations, setOperations, isAdminMode }) {
         </form>
       )}
 
-      <div className="bed-grid">
-        {operations.map((mission) => (
-          <div className="bed-card" key={mission.operation}>
-            <span>{mission.operation}</span>
-            <strong>{mission.type}</strong>
-            <p>Asset: {mission.asset}</p>
-
-            {isAdminMode ? (
-              <>
-                <label className="field-label">Status</label>
-                <select
-                  className={`status-select ${getStatusClass(mission.status)}`}
-                  value={mission.status}
-                  onChange={(event) =>
-                    updateOperationStatus(
-                      mission.operation,
-                      event.target.value,
-                    )
-                  }
-                >
-                  <option>Ready</option>
-                  <option>Standby</option>
-                  <option>Reserved</option>
-                  <option>Occupied</option>
-                  <option>Offline</option>
-                </select>
-
-                <label className="field-label">Priority</label>
-                <select
-                  className="inline-input"
-                  value={mission.priority}
-                  onChange={(event) =>
-                    updateOperationPriority(
-                      mission.operation,
-                      event.target.value,
-                    )
-                  }
-                >
-                  <option>Normal</option>
-                  <option>High</option>
-                  <option>Critical</option>
-                </select>
-
-                <button
-                  className="admin-button danger-button"
-                  onClick={() => deleteOperation(mission.operation)}
-                >
-                  Delete Operation
-                </button>
-              </>
-            ) : (
-              <>
-                <p>
-                  Status:{' '}
-                  <span className={getStatusClass(mission.status)}>
-                    {mission.status}
-                  </span>
-                </p>
-                <p>Priority: {mission.priority}</p>
-              </>
-            )}
-          </div>
-        ))}
-      </div>
-    </section>
-  )
-}
-
-function MedicalBedsPreview({ medicalBeds }) {
-  const previewBeds = medicalBeds.slice(0, 4)
-
-  return (
-    <section className="panel">
-      <div className="panel-header">
-        <div>
-          <p className="eyebrow">Medical Bay</p>
-          <h3>Normandy Assigned Beds</h3>
+      <div className="table">
+        <div className="table-row table-head">
+          <span>Operation</span>
+          <span>Type</span>
+          <span>Asset</span>
+          <span>Status</span>
         </div>
-        <span className="tag">Standby</span>
-      </div>
 
-      <div className="bed-grid">
-        {previewBeds.map((bed) => (
-          <div className="bed-card" key={bed.bed}>
-            <span>{bed.bed}</span>
-            <strong>{bed.designation}</strong>
-            <p>Assigned: {bed.assignedTo}</p>
-            <p>
-              Status:{' '}
-              <span className={getStatusClass(bed.status)}>
-                {bed.status}
-              </span>
-            </p>
+        {operations.map((mission, index) => (
+          <div className="table-row" key={mission.operation}>
+            <span>{mission.operation}</span>
+            <span>{mission.type}</span>
+            <span>{mission.asset}</span>
+            <span>
+              {isAdminMode ? (
+                <div className="control-group">
+                  <select
+                    className={`status-select ${getStatusClass(
+                      mission.status,
+                    )}`}
+                    value={mission.status}
+                    onChange={(event) =>
+                      updateOperation(index, 'status', event.target.value)
+                    }
+                  >
+                    <option>Ready</option>
+                    <option>Standby</option>
+                    <option>Reserved</option>
+                    <option>Offline</option>
+                  </select>
+
+                  <select
+                    className="status-select"
+                    value={mission.priority}
+                    onChange={(event) =>
+                      updateOperation(index, 'priority', event.target.value)
+                    }
+                  >
+                    <option>Normal</option>
+                    <option>High</option>
+                    <option>Critical</option>
+                  </select>
+
+                  <button
+                    className="small-button danger"
+                    onClick={() => deleteOperation(mission.operation)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              ) : (
+                <span className={getStatusClass(mission.status)}>
+                  {mission.status}
+                </span>
+              )}
+            </span>
           </div>
         ))}
       </div>
     </section>
   )
 }
+
 function Reports({ inventoryItems, fleetShips, medicalBeds, operations }) {
   const generatedAt = new Date().toLocaleString()
   const lowStockItems = inventoryItems.filter((item) => item.quantity <= 30)
@@ -1415,4 +1404,5 @@ END OF REPORT
     </section>
   )
 }
+
 export default App
