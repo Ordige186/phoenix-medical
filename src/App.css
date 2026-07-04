@@ -722,3 +722,102 @@ nav {
     flex-wrap: wrap;
   }
 }
+.logo-image {
+  width: 58px;
+  height: 58px;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 1px solid rgba(185, 28, 28, 0.65);
+  background: rgba(7, 11, 16, 0.8);
+  box-shadow: 0 0 24px rgba(185, 28, 28, 0.22);
+}
+
+.hero-with-logo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 28px;
+}
+
+.hero-text {
+  flex: 1;
+}
+
+.hero-logo {
+  width: 170px;
+  height: 170px;
+  object-fit: cover;
+  border-radius: 28px;
+  border: 1px solid rgba(185, 28, 28, 0.5);
+  background: rgba(7, 11, 16, 0.7);
+  box-shadow:
+    0 0 40px rgba(185, 28, 28, 0.22),
+    inset 0 0 20px rgba(255, 255, 255, 0.03);
+}
+
+@media (max-width: 900px) {
+  .hero-with-logo {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .hero-logo {
+    width: 130px;
+    height: 130px;
+  }
+}
+:root {
+  --phoenix-red: #b91c1c;
+  --phoenix-red-bright: #ef4444;
+  --phoenix-silver: #d1d5db;
+  --phoenix-dark: #070b10;
+}
+
+/* Red command accents */
+.eyebrow,
+.bed-card span,
+.summary-item span,
+.field-label {
+  color: var(--phoenix-red-bright);
+}
+
+/* Red active navigation */
+.nav-item:hover,
+.nav-item.active {
+  border-color: rgba(239, 68, 68, 0.65);
+  background: rgba(185, 28, 28, 0.12);
+}
+
+/* Red panel and hero borders */
+.hero,
+.panel {
+  border-color: rgba(185, 28, 28, 0.28);
+}
+
+/* Red buttons */
+.admin-button,
+.small-button {
+  border-color: rgba(239, 68, 68, 0.35);
+  color: var(--phoenix-red-bright);
+  background: rgba(185, 28, 28, 0.08);
+}
+
+.admin-button:hover,
+.small-button:hover {
+  border-color: rgba(239, 68, 68, 0.75);
+  background: rgba(185, 28, 28, 0.18);
+}
+
+/* Red input focus */
+.search-box:focus,
+.inline-input:focus,
+.admin-form input:focus,
+.admin-form select:focus {
+  border-color: rgba(239, 68, 68, 0.65);
+  box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.12);
+}
+
+/* Red system bar */
+.system-bar {
+  border-top-color: rgba(185, 28, 28, 0.35);
+}

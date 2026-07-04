@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import './App.css'
+import phoenixLogo from './assets/phoenix-logo.png'
 
 const pages = [
   'Dashboard',
@@ -305,7 +306,11 @@ function App() {
     <div className="app">
       <aside className="sidebar">
         <div className="brand">
-          <div className="logo">𓅃</div>
+          <img
+  className="logo-image"
+  src={phoenixLogo}
+  alt="Phoenix Squadron Medical logo"
+/>
           <div>
             <h1>PHOENIX</h1>
             <p>Squadron Medical</p>
@@ -422,14 +427,22 @@ const reservedBeds = medicalBeds.filter(
 
   return (
     <>
-      <section className="hero">
-        <p className="eyebrow">Rapid Medical Response Command</p>
-        <h2>Phoenix Squadron Medical Portal</h2>
-        <p>
-          Operational dashboard for medical readiness, assigned beds, fleet
-          status, and field response coordination.
-        </p>
-      </section>
+      <section className="hero hero-with-logo">
+  <div className="hero-text">
+    <p className="eyebrow">Rapid Medical Response Command</p>
+    <h2>Phoenix Squadron Medical Portal</h2>
+            <p>
+      Operational dashboard for medical readiness, assigned beds, fleet
+      status, and field response coordination.
+    </p>
+  </div>
+
+  <img
+    className="hero-logo"
+    src={phoenixLogo}
+    alt="Phoenix Squadron Medical logo"
+  />
+</section>
 
       <section className="status-grid">
         <div className="card green">
