@@ -184,6 +184,37 @@ const personnelRoster = [
   },
 ]
 
+const startingOperations = [
+  {
+    operation: 'Phoenix Medical Standby',
+    type: 'QRF',
+    asset: 'Normandy',
+    status: 'Standby',
+    priority: 'Normal',
+  },
+  {
+    operation: 'Beacon Response',
+    type: 'Search and Rescue',
+    asset: 'C8R Pisces Rescue',
+    status: 'Ready',
+    priority: 'High',
+  },
+  {
+    operation: 'MASCAS Support',
+    type: 'Mass Casualty',
+    asset: 'RSI Apollo Triage',
+    status: 'Reserved',
+    priority: 'Critical',
+  },
+  {
+    operation: 'Fleet Medical Escort',
+    type: 'Medical Overwatch',
+    asset: 'RSI Apollo Medivac',
+    status: 'Ready',
+    priority: 'Normal',
+  },
+]
+
 function App() {
   const [activePage, setActivePage] = useState('Dashboard')
   const [isAdminMode, setIsAdminMode] = useState(false)
@@ -218,6 +249,16 @@ function App() {
     return startingFleetShips
   })
 
+  const [operations, setOperations] = useState(() => {
+    const savedOperations = localStorage.getItem('phoenixOperations')
+
+    if (savedOperations) {
+      return JSON.parse(savedOperations)
+    }
+
+    return startingOperations
+  })
+
   useEffect(() => {
     localStorage.setItem('phoenixInventory', JSON.stringify(inventoryItems))
   }, [inventoryItems])
@@ -230,13 +271,34 @@ function App() {
     localStorage.setItem('phoenixFleet', JSON.stringify(fleetShips))
   }, [fleetShips])
 
+  useEffect(() => {
+    localStorage.setItem('phoenixOperations', JSON.stringify(operations))
+  }, [operations])
+
   const activePersonnel = personnelRoster.filter(
     (member) => member.status === 'Active',
   ).length
 
   const shipsReady = fleetShips.filter((ship) => ship.status === 'Ready').length
 
-  const pendingRequests = 2
+  const pendingRequests = operations.filter(
+    (mission) => mission.status === 'Standby' || mission.status === 'Reserved',
+  ).length
+
+  function toggleAdminMode() {
+    if (isAdminMode) {
+      setIsAdminMode(false)
+      return
+    }
+
+    const pin = window.prompt('Enter Phoenix Medical admin PIN')
+
+    if (pin === '186') {
+      setIsAdminMode(true)
+    } else if (pin !== null) {
+      window.alert('Incorrect admin PIN')
+    }
+  }
 
   return (
     <div className="app">
@@ -262,27 +324,14 @@ function App() {
         </nav>
 
         <div className="admin-toggle">
-  <p>Access Mode</p>
-  <button
-    className={isAdminMode ? 'mode-button active' : 'mode-button'}
-    onClick={() => {
-      if (isAdminMode) {
-        setIsAdminMode(false)
-        return
-      }
-
-      const pin = window.prompt('Enter Phoenix Medical admin PIN')
-
-      if (pin === '186') {
-        setIsAdminMode(true)
-      } else if (pin !== null) {
-        window.alert('Incorrect admin PIN')
-      }
-    }}
-  >
-    {isAdminMode ? 'Admin Mode' : 'View Mode'}
-  </button>
-</div>
+          <p>Access Mode</p>
+          <button
+            className={isAdminMode ? 'mode-button active' : 'mode-button'}
+            onClick={toggleAdminMode}
+          >
+            {isAdminMode ? 'Admin Mode' : 'View Mode'}
+          </button>
+        </div>
       </aside>
 
       <main className="main">
@@ -322,7 +371,13 @@ function App() {
           />
         )}
 
-        {activePage === 'Operations' && <Operations />}
+        {activePage === 'Operations' && (
+          <Operations
+            operations={operations}
+            setOperations={setOperations}
+            isAdminMode={isAdminMode}
+          />
+        )}
       </main>
     </div>
   )
@@ -357,7 +412,7 @@ function Dashboard({ activePersonnel, shipsReady, pendingRequests, medicalBeds }
         </div>
 
         <div className="card amber">
-          <p>Pending Requests</p>
+          <p>Pending Operations</p>
           <h3>{pendingRequests}</h3>
         </div>
       </section>
@@ -672,7 +727,11 @@ function Inventory({
         onChange={(event) => setSearchTerm(event.target.value)}
       />
 
-      <div className={isAdminMode ? 'table inventory-table' : 'table inventory-table view-only'}>
+      <div
+        className={
+          isAdminMode ? 'table inventory-table' : 'table inventory-table view-only'
+        }
+      >
         <div className="table-row table-head">
           <span>Item</span>
           <span>Category</span>
@@ -853,7 +912,79 @@ function MedicalBeds({ medicalBeds, setMedicalBeds, isAdminMode }) {
   )
 }
 
-function Operations() {
+function Operations({ operations, setOperations, isAdminMode }) {
+  const [newOperation, setNewOperation] = useState('')
+  const [newType, setNewType] = useState('')
+  const [newAsset, setNewAsset] = useState('')
+  const [newStatus, setNewStatus] = useState('Standby')
+  const [newPriority, setNewPriority] = useState('Normal')
+
+  function addOperation(event) {
+    event.preventDefault()
+
+    if (!newOperation || !newType || !newAsset) {
+      return
+    }
+
+    const operationToAdd = {
+      operation: newOperation,
+      type: newType,
+      asset: newAsset,
+      status: newStatus,
+      priority: newPriority,
+    }
+
+    setOperations([...operations, operationToAdd])
+
+    setNewOperation('')
+    setNewType('')
+    setNewAsset('')
+    setNewStatus('Standby')
+    setNewPriority('Normal')
+  }
+
+  function updateOperationStatus(operationName, newStatusValue) {
+    const updatedOperations = operations.map((mission) => {
+      if (mission.operation === operationName) {
+        return {
+          ...mission,
+          status: newStatusValue,
+        }
+      }
+
+      return mission
+    })
+
+    setOperations(updatedOperations)
+  }
+
+  function updateOperationPriority(operationName, newPriorityValue) {
+    const updatedOperations = operations.map((mission) => {
+      if (mission.operation === operationName) {
+        return {
+          ...mission,
+          priority: newPriorityValue,
+        }
+      }
+
+      return mission
+    })
+
+    setOperations(updatedOperations)
+  }
+
+  function deleteOperation(operationName) {
+    const updatedOperations = operations.filter((mission) => {
+      return mission.operation !== operationName
+    })
+
+    setOperations(updatedOperations)
+  }
+
+  function resetOperations() {
+    setOperations(startingOperations)
+  }
+
   return (
     <section className="panel">
       <div className="panel-header">
@@ -861,49 +992,129 @@ function Operations() {
           <p className="eyebrow">Command Operations</p>
           <h3>Mission Board</h3>
         </div>
-        <span className="tag">QRF Standby</span>
+
+        <div className="panel-actions">
+          {isAdminMode && (
+            <button className="admin-button" onClick={resetOperations}>
+              Reset Operations
+            </button>
+          )}
+          <span className="tag">{isAdminMode ? 'Admin Mode' : 'View Mode'}</span>
+        </div>
       </div>
 
+      {isAdminMode && (
+        <form className="admin-form operations-form" onSubmit={addOperation}>
+          <input
+            type="text"
+            placeholder="Operation name"
+            value={newOperation}
+            onChange={(event) => setNewOperation(event.target.value)}
+          />
+
+          <input
+            type="text"
+            placeholder="Type"
+            value={newType}
+            onChange={(event) => setNewType(event.target.value)}
+          />
+
+          <input
+            type="text"
+            placeholder="Assigned asset"
+            value={newAsset}
+            onChange={(event) => setNewAsset(event.target.value)}
+          />
+
+          <select
+            value={newStatus}
+            onChange={(event) => setNewStatus(event.target.value)}
+          >
+            <option>Ready</option>
+            <option>Standby</option>
+            <option>Reserved</option>
+            <option>Occupied</option>
+            <option>Offline</option>
+          </select>
+
+          <select
+            value={newPriority}
+            onChange={(event) => setNewPriority(event.target.value)}
+          >
+            <option>Normal</option>
+            <option>High</option>
+            <option>Critical</option>
+          </select>
+
+          <button className="admin-button" type="submit">
+            Add Operation
+          </button>
+        </form>
+      )}
+
       <div className="bed-grid">
-        <div className="bed-card">
-          <span>Phoenix Medical Standby</span>
-          <strong>QRF</strong>
-          <p>Asset: Normandy</p>
-          <p>
-            Status: <span className={getStatusClass('Standby')}>Standby</span>
-          </p>
-          <p>Priority: Normal</p>
-        </div>
+        {operations.map((mission) => (
+          <div className="bed-card" key={mission.operation}>
+            <span>{mission.operation}</span>
+            <strong>{mission.type}</strong>
+            <p>Asset: {mission.asset}</p>
 
-        <div className="bed-card">
-          <span>Beacon Response</span>
-          <strong>Search and Rescue</strong>
-          <p>Asset: C8R Pisces Rescue</p>
-          <p>
-            Status: <span className={getStatusClass('Ready')}>Ready</span>
-          </p>
-          <p>Priority: High</p>
-        </div>
+            {isAdminMode ? (
+              <>
+                <label className="field-label">Status</label>
+                <select
+                  className={`status-select ${getStatusClass(mission.status)}`}
+                  value={mission.status}
+                  onChange={(event) =>
+                    updateOperationStatus(
+                      mission.operation,
+                      event.target.value,
+                    )
+                  }
+                >
+                  <option>Ready</option>
+                  <option>Standby</option>
+                  <option>Reserved</option>
+                  <option>Occupied</option>
+                  <option>Offline</option>
+                </select>
 
-        <div className="bed-card">
-          <span>MASCAS Support</span>
-          <strong>Mass Casualty</strong>
-          <p>Asset: RSI Apollo Triage</p>
-          <p>
-            Status: <span className={getStatusClass('Reserved')}>Reserved</span>
-          </p>
-          <p>Priority: Critical</p>
-        </div>
+                <label className="field-label">Priority</label>
+                <select
+                  className="inline-input"
+                  value={mission.priority}
+                  onChange={(event) =>
+                    updateOperationPriority(
+                      mission.operation,
+                      event.target.value,
+                    )
+                  }
+                >
+                  <option>Normal</option>
+                  <option>High</option>
+                  <option>Critical</option>
+                </select>
 
-        <div className="bed-card">
-          <span>Fleet Medical Escort</span>
-          <strong>Medical Overwatch</strong>
-          <p>Asset: RSI Apollo Medivac</p>
-          <p>
-            Status: <span className={getStatusClass('Ready')}>Ready</span>
-          </p>
-          <p>Priority: Normal</p>
-        </div>
+                <button
+                  className="admin-button danger-button"
+                  onClick={() => deleteOperation(mission.operation)}
+                >
+                  Delete Operation
+                </button>
+              </>
+            ) : (
+              <>
+                <p>
+                  Status:{' '}
+                  <span className={getStatusClass(mission.status)}>
+                    {mission.status}
+                  </span>
+                </p>
+                <p>Priority: {mission.priority}</p>
+              </>
+            )}
+          </div>
+        ))}
       </div>
     </section>
   )

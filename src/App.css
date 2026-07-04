@@ -545,3 +545,47 @@ nav {
   background: rgba(255, 107, 107, 0.08);
   border-color: rgba(255, 107, 107, 0.45);
 }
+.operations-form {
+  grid-template-columns: 1.2fr 1fr 1fr 0.8fr 0.8fr auto;
+}
+
+.danger-button {
+  width: 100%;
+  margin-top: 14px;
+  color: #ff6b6b;
+  border-color: rgba(255, 107, 107, 0.45);
+  background: rgba(255, 107, 107, 0.08);
+}
+
+.danger-button:hover {
+  border-color: rgba(255, 107, 107, 0.8);
+  background: rgba(255, 107, 107, 0.16);
+}
+
+@media (max-width: 900px) {
+  .operations-form {
+    grid-template-columns: 1fr;
+  }
+}
+.operations-form {
+  grid-template-columns: 1.2fr 1fr 1fr 0.8fr 0.8fr auto;
+}
+
+.danger-button {
+  width: 100%;
+  margin-top: 14px;
+  color: #ff6b6b;
+  border-color: rgba(255, 107, 107, 0.45);
+  background: rgba(255, 107, 107, 0.08);
+}
+
+.danger-button:hover {
+  border-color: rgba(255, 107, 107, 0.8);
+  background: rgba(255, 107, 107, 0.16);
+}
+
+@media (max-width: 900px) {
+  .operations-form {
+    grid-template-columns: 1fr;
+  }
+}
