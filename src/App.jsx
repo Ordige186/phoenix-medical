@@ -471,9 +471,10 @@ function App() {
   const [activePage, setActivePage] = useState('Dashboard')
   const [isAdminMode, setIsAdminMode] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem('phoenixAuthenticated') === 'true'
-  })
-  const [accessPin, setAccessPin] = useState('')
+  return localStorage.getItem('phoenixAuthenticated') === 'true'
+})
+const [accessPin, setAccessPin] = useState('')
+const [bootComplete, setBootComplete] = useState(false)
 
   const [inventoryItems, setInventoryItems] = useState(() => {
     const savedInventory = localStorage.getItem('phoenixInventory')
@@ -514,6 +515,14 @@ function App() {
   useEffect(() => {
     localStorage.setItem('phoenixOperations', JSON.stringify(operations))
   }, [operations])
+
+  useEffect(() => {
+  const bootTimer = setTimeout(() => {
+    setBootComplete(true)
+  }, 2800)
+
+  return () => clearTimeout(bootTimer)
+}, [])
 
   const activePersonnel = personnelRoster.filter(
     (member) => member.status === 'Active',
@@ -632,9 +641,51 @@ function App() {
   }
 
   if (!isAuthenticated) {
-    return (
-      <div className="login-screen">
-        <div className="login-card">
+  return (
+    <div className="login-screen terminal-login">
+      {!bootComplete ? (
+        <div className="terminal-frame boot-only">
+          <div className="terminal-topline">
+            <span>PHOENIX MEDICAL COMMAND</span>
+            <span>SECURE ACCESS NODE</span>
+          </div>
+
+          <div className="terminal-code-panel full-terminal">
+            <p className="terminal-line line-1">
+              &gt; INITIALIZING PHOENIX MEDICAL INTERFACE...
+            </p>
+            <p className="terminal-line line-2">
+              &gt; VERIFYING FLEET MEDICAL ASSETS...
+            </p>
+            <p className="terminal-line line-3">
+              &gt; SYNCING IDRIS MEDICAL BAY...
+            </p>
+            <p className="terminal-line line-4">
+              &gt; LOADING APOLLO MODULE CONFIGURATIONS...
+            </p>
+            <p className="terminal-line line-5">
+              &gt; CHECKING C8R AND TERRAPIN MEDICAL READINESS...
+            </p>
+            <p className="terminal-line line-6">
+              &gt; CLASSIFICATION: RESTRICTED
+            </p>
+            <p className="terminal-line line-7">
+              &gt; AUTHENTICATION REQUIRED
+            </p>
+
+            <div className="connecting-box boot-connecting">
+              <span className="scanner-dot"></span>
+              CONNECTING...
+            </div>
+          </div>
+
+          <div className="terminal-bottomline">
+            <span>STATION: PHOENIX SQUADRON MEDICAL</span>
+            <span>STATUS: CONNECTING</span>
+          </div>
+        </div>
+      ) : (
+        <div className="login-card login-only-card">
           <img
             className="login-logo"
             src={phoenixLogo}
@@ -645,8 +696,8 @@ function App() {
           <h1>Phoenix Squadron Medical</h1>
 
           <p className="login-subtitle">
-            Authenticate to access fleet medical readiness, inventory,
-            operations, and Normandy bed assignments.
+            Medical response interface locked. Enter access PIN to load
+            inventory, fleet assets, operations, and shipboard medical beds.
           </p>
 
           <form className="login-form" onSubmit={authenticatePortal}>
@@ -655,6 +706,7 @@ function App() {
               placeholder="Enter access PIN"
               value={accessPin}
               onChange={(event) => setAccessPin(event.target.value)}
+              autoFocus
             />
 
             <button className="admin-button" type="submit">
@@ -667,9 +719,10 @@ function App() {
             <span>PHOENIX MEDICAL COMMAND</span>
           </div>
         </div>
-      </div>
-    )
-  }
+      )}
+    </div>
+  )
+}
 
   return (
     <div className="app">
@@ -688,10 +741,14 @@ function App() {
         </div>
 
         <button className="mode-button" onClick={toggleAdminMode}>
-          {isAdminMode ? 'Admin Mode' : 'View Mode'}
-        </button>
+  {isAdminMode ? 'Admin Mode' : 'View Mode'}
+</button>
 
-        <nav>
+<button className="logout-button" onClick={logoutPortal}>
+  Logout
+</button>
+
+<nav>
           {pages.map((page) => (
             <button
               key={page}

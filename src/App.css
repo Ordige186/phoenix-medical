@@ -1187,3 +1187,241 @@ body {
     grid-template-columns: 1fr;
   }
 }
+/* ================================
+   Phoenix Terminal Login Intro
+   ================================ */
+
+.terminal-login {
+  background:
+    linear-gradient(rgba(185, 28, 28, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(185, 28, 28, 0.04) 1px, transparent 1px),
+    radial-gradient(circle at top, rgba(185, 28, 28, 0.18), transparent 34%),
+    radial-gradient(circle at bottom left, rgba(143, 199, 255, 0.08), transparent 28%),
+    #05070a;
+  background-size:
+    34px 34px,
+    34px 34px,
+    auto,
+    auto,
+    auto;
+}
+
+.terminal-frame {
+  width: min(980px, 100%);
+  border: 1px solid rgba(185, 28, 28, 0.35);
+  border-radius: 28px;
+  background: rgba(7, 11, 16, 0.78);
+  box-shadow:
+    0 30px 100px rgba(0, 0, 0, 0.65),
+    0 0 50px rgba(185, 28, 28, 0.18);
+  overflow: hidden;
+}
+
+.terminal-topline,
+.terminal-bottomline {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 18px;
+  border-bottom: 1px solid rgba(185, 28, 28, 0.25);
+  color: #ef4444;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+}
+
+.terminal-bottomline {
+  border-top: 1px solid rgba(185, 28, 28, 0.25);
+  border-bottom: none;
+  color: #9ba8b5;
+}
+
+.terminal-grid {
+  display: grid;
+  grid-template-columns: 1fr 460px;
+  gap: 0;
+}
+
+.terminal-code-panel {
+  padding: 34px;
+  border-right: 1px solid rgba(185, 28, 28, 0.22);
+  background:
+    linear-gradient(180deg, rgba(185, 28, 28, 0.08), transparent),
+    rgba(0, 0, 0, 0.22);
+  min-height: 520px;
+}
+
+.terminal-line {
+  margin: 0 0 14px;
+  color: #d1d5db;
+  font-family: Consolas, 'Courier New', monospace;
+  font-size: 13px;
+  letter-spacing: 0.3px;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: terminalReveal 0.35s ease forwards;
+}
+
+.line-1 {
+  animation-delay: 0.2s;
+}
+
+.line-2 {
+  animation-delay: 0.55s;
+}
+
+.line-3 {
+  animation-delay: 0.9s;
+}
+
+.line-4 {
+  animation-delay: 1.25s;
+}
+
+.line-5 {
+  animation-delay: 1.6s;
+}
+
+.line-6 {
+  animation-delay: 1.95s;
+  color: #ef4444;
+}
+
+.line-7 {
+  animation-delay: 2.3s;
+  color: #49f28d;
+}
+
+@keyframes terminalReveal {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.terminal-frame .login-card {
+  width: 100%;
+  min-height: 520px;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  background:
+    radial-gradient(circle at top, rgba(185, 28, 28, 0.16), transparent 36%),
+    linear-gradient(145deg, rgba(15, 26, 38, 0.96), rgba(7, 11, 16, 0.98));
+  opacity: 0.78;
+}
+
+.terminal-frame .login-card.boot-ready {
+  opacity: 1;
+}
+
+.connecting-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid rgba(73, 242, 141, 0.22);
+  border-radius: 12px;
+  background: rgba(73, 242, 141, 0.06);
+  color: #49f28d;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+}
+
+.scanner-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: #49f28d;
+  box-shadow: 0 0 14px rgba(73, 242, 141, 0.8);
+  animation: pulseDot 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes pulseDot {
+  from {
+    opacity: 0.35;
+    transform: scale(0.85);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+@media (max-width: 900px) {
+  .terminal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .terminal-code-panel {
+    min-height: auto;
+    border-right: none;
+    border-bottom: 1px solid rgba(185, 28, 28, 0.22);
+  }
+
+  .terminal-frame .login-card {
+    min-height: auto;
+  }
+
+  .terminal-topline,
+  .terminal-bottomline {
+    flex-direction: column;
+  }
+}
+.logout-button {
+  width: 100%;
+  margin: 10px 0 18px;
+  padding: 12px 14px;
+  border: 1px solid rgba(239, 68, 68, 0.38);
+  border-radius: 12px;
+  background: rgba(185, 28, 28, 0.08);
+  color: #ef4444;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.logout-button:hover {
+  border-color: rgba(239, 68, 68, 0.75);
+  background: rgba(185, 28, 28, 0.18);
+}
+/* ================================
+   Boot First, Login Second
+   ================================ */
+
+.boot-only {
+  width: min(780px, 100%);
+}
+
+.full-terminal {
+  min-height: 430px;
+  border-right: none;
+}
+
+.boot-connecting {
+  margin-top: 28px;
+}
+
+.login-only-card {
+  width: min(460px, 100%);
+  animation: loginFadeIn 0.45s ease forwards;
+}
+
+@keyframes loginFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
