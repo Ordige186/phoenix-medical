@@ -1,111 +1,435 @@
-:root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
-
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
-
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
+html,
+body,
+#root {
+  width: 100%;
+  min-width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  margin: 0;
+  display: block;
+  place-items: unset;
+  overflow-x: hidden;
 }
 
 #root {
-  width: 1126px;
+  max-width: none;
+  text-align: left;
+}
+/* ================================
+   Readability Fix After Fullscreen Pass
+   Keeps full-width layout but makes text readable
+   ================================ */
+
+/* Main layout stays full width */
+.console-app {
+  grid-template-columns: 250px minmax(0, 1fr) !important;
+  grid-template-rows: 70px minmax(0, 1fr) !important;
+}
+
+.top-bar {
+  grid-template-columns:
+    250px
+    minmax(360px, 1fr)
+    145px
+    145px
+    145px
+    145px
+    165px !important;
+}
+
+.console-sidebar {
+  width: 250px !important;
+  min-height: calc(100vh - 70px) !important;
+}
+
+.console-main {
+  padding: 18px !important;
+}
+
+/* Top bar readable again */
+.top-title span {
+  font-size: 18px !important;
+  letter-spacing: 6px !important;
+}
+
+.top-title small,
+.top-classification,
+.top-sync,
+.top-stat span {
+  font-size: 9px !important;
+  letter-spacing: 2.5px !important;
+}
+
+.top-stat strong {
+  font-size: 20px !important;
+}
+
+/* Sidebar readable */
+.sidebar-brand img {
+  width: 40px !important;
+  height: 40px !important;
+}
+
+.sidebar-brand h1 {
+  font-size: 13px !important;
+  letter-spacing: 3px !important;
+}
+
+.sidebar-brand span {
+  font-size: 9px !important;
+}
+
+.sidebar-section-title {
+  font-size: 9px !important;
+  letter-spacing: 3px !important;
+}
+
+.ship-button,
+.nav-link {
+  min-height: 40px !important;
+  font-size: 12px !important;
+  padding: 10px 14px !important;
+}
+
+.ship-button small {
+  font-size: 8px !important;
+}
+
+/* Page header readable */
+.panel-command-row {
+  min-height: 72px !important;
+  padding: 18px 22px !important;
+}
+
+.panel-command-row h2 {
+  font-size: 20px !important;
+  letter-spacing: 3px !important;
+}
+
+.section-kicker {
+  font-size: 10px !important;
+  letter-spacing: 3px !important;
+}
+
+/* Tabs readable */
+.console-tabs {
+  padding: 16px 20px !important;
+  gap: 12px !important;
+}
+
+.console-tabs button {
+  min-height: 42px !important;
+  font-size: 10px !important;
+  letter-spacing: 3px !important;
+}
+
+/* Bed cards readable and still horizontal */
+.bed-console-grid {
+  padding: 18px 20px 28px !important;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)) !important;
+  gap: 16px !important;
+}
+
+.bed-console-card {
+  min-height: 420px !important;
+  padding: 18px !important;
+  gap: 12px !important;
+  border-radius: 10px !important;
+}
+
+.bed-card-header > span {
+  font-size: 12px !important;
+  letter-spacing: 3px !important;
+}
+
+.bed-card-badges strong,
+.bed-card-badges em,
+.status-pill {
+  min-height: 24px !important;
+  padding: 4px 8px !important;
+  font-size: 9px !important;
+}
+
+.bed-location {
+  font-size: 10px !important;
+  letter-spacing: 4px !important;
+}
+
+.medgel-row,
+.bed-storage {
+  font-size: 10px !important;
+  letter-spacing: 2px !important;
+}
+
+.medgel-row strong,
+.bed-storage strong {
+  font-size: 12px !important;
+}
+
+.medgel-track {
+  height: 8px !important;
+}
+
+.respawn-header {
+  font-size: 10px !important;
+  letter-spacing: 4px !important;
+}
+
+.empty-text {
+  font-size: 12px !important;
+}
+
+/* Admin controls readable */
+.bed-admin-controls label {
+  font-size: 9px !important;
+}
+
+.bed-admin-controls input,
+.bed-admin-controls select,
+.bed-admin-controls button {
+  min-height: 36px !important;
+  font-size: 11px !important;
+  padding: 7px 8px !important;
+}
+
+.respawn-row {
+  min-height: 44px !important;
+}
+
+.respawn-row span,
+.respawn-row input,
+.respawn-row button {
+  height: 44px !important;
+  font-size: 12px !important;
+}
+
+.input-row {
+  grid-template-columns: 1fr 72px !important;
+}
+
+/* Supplies/activity readability */
+.supply-row {
+  min-height: 62px !important;
+  padding: 12px 16px !important;
+}
+
+.supply-row strong,
+.activity-row strong {
+  font-size: 13px !important;
+}
+
+.supply-row span,
+.supply-row em,
+.activity-row em,
+.activity-row small {
+  font-size: 11px !important;
+}
+
+.activity-row {
+  min-height: 58px !important;
+}
+
+/* Floor plan readable */
+.floor-plan {
+  min-height: calc(100vh - 170px) !important;
+}
+
+.floor-bed {
+  min-height: 190px !important;
+}
+
+.floor-bed strong {
+  font-size: 15px !important;
+}
+
+.floor-bed span,
+.floor-bed small {
+  font-size: 11px !important;
+}
+/* ================================
+   Phoenix Identity Pass
+   Fix title overflow + move away from 22nd blue
+   ================================ */
+
+:root {
+  --phoenix-blue: #7dd3fc;
+  --phoenix-blue-soft: #9cc9e8;
+  --phoenix-red: #ef4444;
+  --phoenix-red-dark: #7f1d1d;
+  --phoenix-green: #18d6a3;
+  --phoenix-silver: #d7dde5;
+  --phoenix-muted-red: rgba(239, 68, 68, 0.18);
+  --line-blue: rgba(125, 211, 252, 0.2);
+  --line-blue-strong: rgba(239, 68, 68, 0.38);
+}
+
+/* Fix top-left title overflow */
+.top-title {
+  min-width: 0;
+  overflow: hidden;
+  padding: 0 12px !important;
+}
+
+.top-title span {
   max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
+  display: block;
+  overflow: hidden;
+  color: var(--phoenix-silver) !important;
+  font-size: 15px !important;
+  letter-spacing: 4px !important;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+.top-title small {
+  color: var(--phoenix-red) !important;
 }
 
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
+/* Add a red Phoenix command glow instead of full 22nd blue */
+.top-bar {
+  border-bottom-color: rgba(239, 68, 68, 0.38) !important;
+  background:
+    linear-gradient(180deg, rgba(18, 20, 26, 0.98), rgba(5, 8, 13, 0.98)) !important;
 }
 
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+.console-sidebar {
+  border-right-color: rgba(239, 68, 68, 0.28) !important;
+  background:
+    linear-gradient(180deg, rgba(16, 18, 24, 0.98), rgba(4, 7, 12, 0.98)) !important;
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+.console-panel {
+  border-color: rgba(239, 68, 68, 0.22) !important;
+  background:
+    linear-gradient(180deg, rgba(12, 16, 24, 0.95), rgba(3, 7, 12, 0.95)) !important;
+}
+
+/* Phoenix red primary labels */
+.sidebar-brand h1,
+.sidebar-section-title,
+.section-kicker,
+.panel-command-row h2 {
+  color: var(--phoenix-silver) !important;
+}
+
+.sidebar-section-title,
+.section-kicker {
+  color: var(--phoenix-red) !important;
+}
+
+/* Nav active state: red/silver instead of blue */
+.ship-button:hover,
+.nav-link:hover,
+.ship-button.active,
+.nav-link.active {
+  border-left-color: var(--phoenix-red) !important;
+  background: rgba(239, 68, 68, 0.12) !important;
+  color: var(--phoenix-silver) !important;
+}
+
+.ship-button.active small {
+  color: var(--phoenix-red) !important;
+  border-color: rgba(239, 68, 68, 0.38) !important;
+}
+
+/* Tabs: red active with muted blue secondary */
+.console-tabs button {
+  border-color: rgba(125, 211, 252, 0.16) !important;
+  color: #8ea6b8 !important;
+}
+
+.console-tabs button.active {
+  border-color: rgba(239, 68, 68, 0.42) !important;
+  background: rgba(239, 68, 68, 0.16) !important;
+  color: var(--phoenix-silver) !important;
+}
+
+/* Bed cards: darker silver/red frame */
+.bed-console-card {
+  border-color: rgba(239, 68, 68, 0.24) !important;
+  background:
+    linear-gradient(180deg, rgba(12, 17, 25, 0.98), rgba(4, 8, 14, 0.98)) !important;
+}
+
+.bed-card-header {
+  border-bottom-color: rgba(239, 68, 68, 0.18) !important;
+}
+
+.bed-card-header > span {
+  color: var(--phoenix-silver) !important;
+}
+
+.bed-card-badges strong {
+  border-color: rgba(24, 214, 163, 0.32) !important;
+  background: rgba(24, 214, 163, 0.1) !important;
+  color: var(--phoenix-green) !important;
+}
+
+.bed-card-badges em {
+  border-color: rgba(239, 68, 68, 0.35) !important;
+  background: rgba(239, 68, 68, 0.1) !important;
+  color: #fecaca !important;
+}
+
+/* MedGel still green, but less neon */
+.medgel-fill {
+  background: linear-gradient(90deg, #18d6a3, #94f2d4) !important;
+  box-shadow: 0 0 10px rgba(24, 214, 163, 0.28) !important;
+}
+
+.medgel-row strong,
+.bed-storage strong {
+  color: #5ff0c8 !important;
+}
+
+/* Buttons: Phoenix red primary */
+.console-button,
+.sidebar-control,
+.form-actions button,
+.bed-admin-controls button {
+  border-color: rgba(239, 68, 68, 0.34) !important;
+  background: rgba(239, 68, 68, 0.08) !important;
+  color: #fecaca !important;
+}
+
+.console-button:hover,
+.sidebar-control:hover,
+.form-actions button:hover,
+.bed-admin-controls button:hover {
+  border-color: rgba(239, 68, 68, 0.75) !important;
+  background: rgba(239, 68, 68, 0.16) !important;
+}
+
+/* Keep live sync green so it stands out */
+.top-sync {
+  color: var(--phoenix-green) !important;
+}
+
+.sync-dot {
+  background: var(--phoenix-green) !important;
+}
+
+/* Login/boot screen Phoenix tone */
+.login-card h1,
+.boot-header span {
+  color: var(--phoenix-silver) !important;
+}
+
+.login-card button {
+  border-color: rgba(239, 68, 68, 0.55) !important;
+  background:
+    linear-gradient(180deg, rgba(127, 29, 29, 0.85), rgba(69, 10, 10, 0.95)) !important;
+  color: #fecaca !important;
+}
+
+.login-card input {
+  border-color: rgba(239, 68, 68, 0.28) !important;
+}
+
+.login-card input:focus {
+  border-color: rgba(239, 68, 68, 0.75) !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12) !important;
 }

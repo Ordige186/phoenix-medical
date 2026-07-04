@@ -1,538 +1,406 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import './App.css'
 import phoenixLogo from './assets/phoenix-logo.png'
-
-const pages = [
-  'Dashboard',
-  'Personnel',
-  'Fleet',
-  'Inventory',
-  'Medical Beds',
-  'Operations',
-  'Reports',
-]
 
 const ACCESS_PIN = '186'
 const ADMIN_PIN = '186'
 
-function getStatusClass(status) {
-  return `status-pill status-${status.toLowerCase().replaceAll(' ', '-')}`
-}
-
-function getStockLevel(quantity) {
-  if (quantity <= 10) return 'Critical'
-  if (quantity <= 30) return 'Low'
-  return 'Good'
-}
-
-const startingInventoryItems = [
-  {
-    item: 'MedGun',
-    category: 'Medical Tool',
-    quantity: 25,
-    status: 'Ready',
-  },
-  {
-    item: 'OxyPen',
-    category: 'Medication',
-    quantity: 120,
-    status: 'In Stock',
-  },
-  {
-    item: 'Hemozal',
-    category: 'Medication',
-    quantity: 80,
-    status: 'In Stock',
-  },
-  {
-    item: 'MedGel',
-    category: 'Medical Supply',
-    quantity: 32,
-    status: 'Monitor',
-  },
-  {
-    item: 'Canoiodide Pen',
-    category: 'Medication',
-    quantity: 40,
-    status: 'In Stock',
-  },
-  {
-    item: 'DetoxPen',
-    category: 'Medication',
-    quantity: 35,
-    status: 'In Stock',
-  },
-  {
-    item: 'Paramed Medical Device',
-    category: 'Medical Tool',
-    quantity: 12,
-    status: 'Ready',
-  },
-  {
-    item: 'Cambio-Lite SRT Attachment',
-    category: 'Rescue Equipment',
-    quantity: 8,
-    status: 'Ready',
-  },
+const pages = [
+  'Beds & Respawns',
+  'Ship Supplies',
+  'Supply Issue',
+  'Medic Roster',
+  'Activity Log',
+  'Reports',
 ]
 
-const startingMedicalBeds = [
+const startingShips = [
   {
-    area: 'Normandy / Idris Medical Bay',
-    configuration: 'Standard Idris Medical Bay',
-    tier: 'T3',
-    bed: 'T3 Bed 01',
-    designation: 'Trauma Bed Alpha',
-    assignedTo: 'Unassigned',
-    status: 'Available',
-    purpose: 'Primary casualty stabilization',
+    id: 'idris',
+    name: 'Idris',
+    className: 'Capital Medical Bay',
+    status: 'Active',
+    type: 'Fixed Medical Bay',
+    configuration: 'T3 x4 / T2 x1',
   },
   {
-    area: 'Normandy / Idris Medical Bay',
-    configuration: 'Standard Idris Medical Bay',
-    tier: 'T3',
-    bed: 'T3 Bed 02',
-    designation: 'Trauma Bed Bravo',
-    assignedTo: 'Unassigned',
-    status: 'Available',
-    purpose: 'Primary casualty stabilization',
-  },
-  {
-    area: 'Normandy / Idris Medical Bay',
-    configuration: 'Standard Idris Medical Bay',
-    tier: 'T3',
-    bed: 'T3 Bed 03',
-    designation: 'Trauma Bed Charlie',
-    assignedTo: 'Unassigned',
-    status: 'Available',
-    purpose: 'Overflow casualty treatment',
-  },
-  {
-    area: 'Normandy / Idris Medical Bay',
-    configuration: 'Standard Idris Medical Bay',
-    tier: 'T3',
-    bed: 'T3 Bed 04',
-    designation: 'Trauma Bed Delta',
-    assignedTo: 'Unassigned',
-    status: 'Available',
-    purpose: 'Overflow casualty treatment',
-  },
-  {
-    area: 'Normandy / Idris Medical Bay',
-    configuration: 'Operations Room',
-    tier: 'T2',
-    bed: 'T2 Bed 01',
-    designation: 'Operations Room Medical Bed',
-    assignedTo: 'Unassigned',
-    status: 'Reserved',
-    purpose: 'Operations room casualty care / priority patient',
-  },
-
-  {
-    area: 'RSI Apollo Medivac',
-    configuration: 'T3 Module',
-    tier: 'T3',
-    bed: 'Left T3 Bed 01',
-    designation: 'Left Side Treatment Bed',
-    assignedTo: 'Unassigned',
-    status: 'Available',
-    purpose: 'Basic treatment / casualty holding',
-  },
-  {
-    area: 'RSI Apollo Medivac',
-    configuration: 'T3 Module',
-    tier: 'T3',
-    bed: 'Left T3 Bed 02',
-    designation: 'Left Side Treatment Bed',
-    assignedTo: 'Unassigned',
-    status: 'Available',
-    purpose: 'Basic treatment / casualty holding',
-  },
-  {
-    area: 'RSI Apollo Medivac',
-    configuration: 'T3 Module',
-    tier: 'T3',
-    bed: 'Left T3 Bed 03',
-    designation: 'Left Side Treatment Bed',
-    assignedTo: 'Unassigned',
-    status: 'Available',
-    purpose: 'Basic treatment / casualty holding',
-  },
-  {
-    area: 'RSI Apollo Medivac',
-    configuration: 'T3 Module',
-    tier: 'T3',
-    bed: 'Right T3 Bed 01',
-    designation: 'Right Side Treatment Bed',
-    assignedTo: 'Unassigned',
-    status: 'Available',
-    purpose: 'Basic treatment / casualty holding',
-  },
-  {
-    area: 'RSI Apollo Medivac',
-    configuration: 'T3 Module',
-    tier: 'T3',
-    bed: 'Right T3 Bed 02',
-    designation: 'Right Side Treatment Bed',
-    assignedTo: 'Unassigned',
-    status: 'Available',
-    purpose: 'Basic treatment / casualty holding',
-  },
-  {
-    area: 'RSI Apollo Medivac',
-    configuration: 'T3 Module',
-    tier: 'T3',
-    bed: 'Right T3 Bed 03',
-    designation: 'Right Side Treatment Bed',
-    assignedTo: 'Unassigned',
-    status: 'Available',
-    purpose: 'Basic treatment / casualty holding',
-  },
-
-  {
-    area: 'RSI Apollo Medivac',
-    configuration: 'T2 Module',
-    tier: 'T2',
-    bed: 'Left T2 Bed 01',
-    designation: 'Left Side Advanced Bed',
-    assignedTo: 'Unassigned',
-    status: 'Available',
-    purpose: 'Advanced treatment / stabilized casualty',
-  },
-  {
-    area: 'RSI Apollo Medivac',
-    configuration: 'T2 Module',
-    tier: 'T2',
-    bed: 'Left T2 Bed 02',
-    designation: 'Left Side Advanced Bed',
-    assignedTo: 'Unassigned',
-    status: 'Available',
-    purpose: 'Advanced treatment / stabilized casualty',
-  },
-  {
-    area: 'RSI Apollo Medivac',
-    configuration: 'T2 Module',
-    tier: 'T2',
-    bed: 'Right T2 Bed 01',
-    designation: 'Right Side Advanced Bed',
-    assignedTo: 'Unassigned',
-    status: 'Available',
-    purpose: 'Advanced treatment / stabilized casualty',
-  },
-  {
-    area: 'RSI Apollo Medivac',
-    configuration: 'T2 Module',
-    tier: 'T2',
-    bed: 'Right T2 Bed 02',
-    designation: 'Right Side Advanced Bed',
-    assignedTo: 'Unassigned',
-    status: 'Available',
-    purpose: 'Advanced treatment / stabilized casualty',
-  },
-
-  {
-    area: 'RSI Apollo Medivac',
-    configuration: 'T1 Module',
-    tier: 'T1',
-    bed: 'Left T1 Bed 01',
-    designation: 'Left Side Critical Bed',
-    assignedTo: 'Unassigned',
-    status: 'Reserved',
-    purpose: 'Critical casualty treatment',
-  },
-  {
-    area: 'RSI Apollo Medivac',
-    configuration: 'T1 Module',
-    tier: 'T1',
-    bed: 'Right T1 Bed 01',
-    designation: 'Right Side Critical Bed',
-    assignedTo: 'Unassigned',
-    status: 'Reserved',
-    purpose: 'Critical casualty treatment',
-  },
-
-  {
-    area: 'RSI Apollo Triage',
-    configuration: 'T3 Module',
-    tier: 'T3',
-    bed: 'Left T3 Bed 01',
-    designation: 'Left Side Triage Bed',
-    assignedTo: 'Unassigned',
-    status: 'Available',
-    purpose: 'Triage / casualty sorting',
-  },
-  {
-    area: 'RSI Apollo Triage',
-    configuration: 'T3 Module',
-    tier: 'T3',
-    bed: 'Left T3 Bed 02',
-    designation: 'Left Side Triage Bed',
-    assignedTo: 'Unassigned',
-    status: 'Available',
-    purpose: 'Triage / casualty sorting',
-  },
-  {
-    area: 'RSI Apollo Triage',
-    configuration: 'T3 Module',
-    tier: 'T3',
-    bed: 'Left T3 Bed 03',
-    designation: 'Left Side Triage Bed',
-    assignedTo: 'Unassigned',
-    status: 'Available',
-    purpose: 'Triage / casualty sorting',
-  },
-  {
-    area: 'RSI Apollo Triage',
-    configuration: 'T3 Module',
-    tier: 'T3',
-    bed: 'Right T3 Bed 01',
-    designation: 'Right Side Triage Bed',
-    assignedTo: 'Unassigned',
-    status: 'Available',
-    purpose: 'Triage / casualty sorting',
-  },
-  {
-    area: 'RSI Apollo Triage',
-    configuration: 'T3 Module',
-    tier: 'T3',
-    bed: 'Right T3 Bed 02',
-    designation: 'Right Side Triage Bed',
-    assignedTo: 'Unassigned',
-    status: 'Available',
-    purpose: 'Triage / casualty sorting',
-  },
-  {
-    area: 'RSI Apollo Triage',
-    configuration: 'T3 Module',
-    tier: 'T3',
-    bed: 'Right T3 Bed 03',
-    designation: 'Right Side Triage Bed',
-    assignedTo: 'Unassigned',
-    status: 'Available',
-    purpose: 'Triage / casualty sorting',
-  },
-
-  {
-    area: 'RSI Apollo Triage',
-    configuration: 'T2 Module',
-    tier: 'T2',
-    bed: 'Left T2 Bed 01',
-    designation: 'Left Side Advanced Triage Bed',
-    assignedTo: 'Unassigned',
-    status: 'Available',
-    purpose: 'Advanced triage / monitored treatment',
-  },
-  {
-    area: 'RSI Apollo Triage',
-    configuration: 'T2 Module',
-    tier: 'T2',
-    bed: 'Left T2 Bed 02',
-    designation: 'Left Side Advanced Triage Bed',
-    assignedTo: 'Unassigned',
-    status: 'Available',
-    purpose: 'Advanced triage / monitored treatment',
-  },
-  {
-    area: 'RSI Apollo Triage',
-    configuration: 'T2 Module',
-    tier: 'T2',
-    bed: 'Right T2 Bed 01',
-    designation: 'Right Side Advanced Triage Bed',
-    assignedTo: 'Unassigned',
-    status: 'Available',
-    purpose: 'Advanced triage / monitored treatment',
-  },
-  {
-    area: 'RSI Apollo Triage',
-    configuration: 'T2 Module',
-    tier: 'T2',
-    bed: 'Right T2 Bed 02',
-    designation: 'Right Side Advanced Triage Bed',
-    assignedTo: 'Unassigned',
-    status: 'Available',
-    purpose: 'Advanced triage / monitored treatment',
-  },
-
-  {
-    area: 'RSI Apollo Triage',
-    configuration: 'T1 Module',
-    tier: 'T1',
-    bed: 'Left T1 Bed 01',
-    designation: 'Left Side Critical Triage Bed',
-    assignedTo: 'Unassigned',
-    status: 'Reserved',
-    purpose: 'Critical casualty triage',
-  },
-  {
-    area: 'RSI Apollo Triage',
-    configuration: 'T1 Module',
-    tier: 'T1',
-    bed: 'Right T1 Bed 01',
-    designation: 'Right Side Critical Triage Bed',
-    assignedTo: 'Unassigned',
-    status: 'Reserved',
-    purpose: 'Critical casualty triage',
-  },
-]
-const startingFleetShips = [
-  {
+    id: 'apollo-medivac',
     name: 'RSI Apollo Medivac',
-    role: 'Primary Medical Ship',
-    status: 'Ready',
-    crew: '4',
-    assignment: 'Advanced casualty care / medevac response',
+    className: 'Modular Medical Ship',
+    status: 'Standby',
+    type: 'Module Based',
+    configuration: 'T3 Module',
   },
   {
+    id: 'apollo-triage',
     name: 'RSI Apollo Triage',
-    role: 'Advanced Treatment Platform',
-    status: 'Ready',
-    crew: '4',
-    assignment: 'Mass casualty stabilization and treatment',
+    className: 'Modular Medical Ship',
+    status: 'Standby',
+    type: 'Module Based',
+    configuration: 'T3 Module',
   },
   {
+    id: 'c8r',
     name: 'C8R Pisces Rescue',
-    role: 'Rapid Response Craft',
-    status: 'Ready',
-    crew: '1',
-    assignment: 'Beacon response / short-range extraction',
+    className: 'Rapid Response Craft',
+    status: 'Active',
+    type: 'Fixed Rescue Bed',
+    configuration: 'Fixed Layout',
   },
   {
-    name: 'Normandy',
-    role: 'Medical Command Ship',
-    status: 'Standby',
-    crew: 'Assigned',
-    assignment: 'Medical bed imprint and casualty processing',
+    id: 'terrapin',
+    name: 'Terrapin Medic',
+    className: 'Armored Medical Rescue Craft',
+    status: 'Offline',
+    type: 'Fixed Medical Craft',
+    configuration: 'Fixed Layout',
   },
 ]
 
-const personnelRoster = [
+const startingBeds = [
   {
-    name: 'Mike Ramirez',
-    callsign: 'Phoenix Actual',
-    role: 'Commander',
-    certifications: 'CASEVAC, Flight Medic, Medical Command',
-    status: 'Active',
+    id: 'idris-bed-1',
+    shipId: 'idris',
+    bedName: 'Bed 1',
+    tier: 'T3 - Basic',
+    location: 'Medical Bay',
+    status: 'Vacant',
+    medGelCurrent: 200,
+    medGelMax: 200,
+    canisters: 2,
+    respawns: [],
   },
   {
-    name: 'Phoenix Med-1',
-    callsign: 'Med-1',
-    role: 'Corpsman',
-    certifications: 'Combat Medic, Shipboard Medical',
-    status: 'Active',
+    id: 'idris-bed-2',
+    shipId: 'idris',
+    bedName: 'Bed 2',
+    tier: 'T3 - Basic',
+    location: 'Medical Bay',
+    status: 'Vacant',
+    medGelCurrent: 200,
+    medGelMax: 200,
+    canisters: 2,
+    respawns: [],
   },
   {
-    name: 'Phoenix Med-2',
-    callsign: 'Med-2',
-    role: 'Corpsman',
-    certifications: 'Shipboard Medical, Casualty Processing',
-    status: 'Standby',
+    id: 'idris-bed-3',
+    shipId: 'idris',
+    bedName: 'Bed 3',
+    tier: 'T3 - Basic',
+    location: 'Medical Bay',
+    status: 'Vacant',
+    medGelCurrent: 200,
+    medGelMax: 200,
+    canisters: 2,
+    respawns: [],
   },
   {
-    name: 'Phoenix Pilot-1',
-    callsign: 'Dustoff-1',
-    role: 'Dropship Pilot',
-    certifications: 'CASEVAC Pilot, Low Altitude Approach',
-    status: 'Active',
+    id: 'idris-bed-4',
+    shipId: 'idris',
+    bedName: 'Bed 4',
+    tier: 'T3 - Basic',
+    location: 'Medical Bay',
+    status: 'Vacant',
+    medGelCurrent: 200,
+    medGelMax: 200,
+    canisters: 2,
+    respawns: [],
+  },
+  {
+    id: 'idris-bed-5',
+    shipId: 'idris',
+    bedName: 'Bed 5',
+    tier: 'T2 - Standard',
+    location: 'Operations Room',
+    status: 'Vacant',
+    medGelCurrent: 400,
+    medGelMax: 400,
+    canisters: 2,
+    respawns: [],
+  },
+  {
+    id: 'apollo-medivac-left-t3-1',
+    shipId: 'apollo-medivac',
+    bedName: 'Left T3 Bed 1',
+    tier: 'T3 - Basic',
+    location: 'Left Module',
+    status: 'Vacant',
+    medGelCurrent: 200,
+    medGelMax: 200,
+    canisters: 2,
+    respawns: [],
+  },
+  {
+    id: 'apollo-medivac-left-t3-2',
+    shipId: 'apollo-medivac',
+    bedName: 'Left T3 Bed 2',
+    tier: 'T3 - Basic',
+    location: 'Left Module',
+    status: 'Vacant',
+    medGelCurrent: 200,
+    medGelMax: 200,
+    canisters: 2,
+    respawns: [],
+  },
+  {
+    id: 'apollo-medivac-left-t3-3',
+    shipId: 'apollo-medivac',
+    bedName: 'Left T3 Bed 3',
+    tier: 'T3 - Basic',
+    location: 'Left Module',
+    status: 'Vacant',
+    medGelCurrent: 200,
+    medGelMax: 200,
+    canisters: 2,
+    respawns: [],
+  },
+  {
+    id: 'apollo-medivac-right-t3-1',
+    shipId: 'apollo-medivac',
+    bedName: 'Right T3 Bed 1',
+    tier: 'T3 - Basic',
+    location: 'Right Module',
+    status: 'Vacant',
+    medGelCurrent: 200,
+    medGelMax: 200,
+    canisters: 2,
+    respawns: [],
+  },
+  {
+    id: 'apollo-medivac-right-t3-2',
+    shipId: 'apollo-medivac',
+    bedName: 'Right T3 Bed 2',
+    tier: 'T3 - Basic',
+    location: 'Right Module',
+    status: 'Vacant',
+    medGelCurrent: 200,
+    medGelMax: 200,
+    canisters: 2,
+    respawns: [],
+  },
+  {
+    id: 'apollo-medivac-right-t3-3',
+    shipId: 'apollo-medivac',
+    bedName: 'Right T3 Bed 3',
+    tier: 'T3 - Basic',
+    location: 'Right Module',
+    status: 'Vacant',
+    medGelCurrent: 200,
+    medGelMax: 200,
+    canisters: 2,
+    respawns: [],
+  },
+  {
+    id: 'apollo-triage-left-t3-1',
+    shipId: 'apollo-triage',
+    bedName: 'Left T3 Bed 1',
+    tier: 'T3 - Basic',
+    location: 'Left Module',
+    status: 'Vacant',
+    medGelCurrent: 200,
+    medGelMax: 200,
+    canisters: 2,
+    respawns: [],
+  },
+  {
+    id: 'apollo-triage-left-t3-2',
+    shipId: 'apollo-triage',
+    bedName: 'Left T3 Bed 2',
+    tier: 'T3 - Basic',
+    location: 'Left Module',
+    status: 'Vacant',
+    medGelCurrent: 200,
+    medGelMax: 200,
+    canisters: 2,
+    respawns: [],
+  },
+  {
+    id: 'apollo-triage-left-t3-3',
+    shipId: 'apollo-triage',
+    bedName: 'Left T3 Bed 3',
+    tier: 'T3 - Basic',
+    location: 'Left Module',
+    status: 'Vacant',
+    medGelCurrent: 200,
+    medGelMax: 200,
+    canisters: 2,
+    respawns: [],
+  },
+  {
+    id: 'apollo-triage-right-t3-1',
+    shipId: 'apollo-triage',
+    bedName: 'Right T3 Bed 1',
+    tier: 'T3 - Basic',
+    location: 'Right Module',
+    status: 'Vacant',
+    medGelCurrent: 200,
+    medGelMax: 200,
+    canisters: 2,
+    respawns: [],
+  },
+  {
+    id: 'apollo-triage-right-t3-2',
+    shipId: 'apollo-triage',
+    bedName: 'Right T3 Bed 2',
+    tier: 'T3 - Basic',
+    location: 'Right Module',
+    status: 'Vacant',
+    medGelCurrent: 200,
+    medGelMax: 200,
+    canisters: 2,
+    respawns: [],
+  },
+  {
+    id: 'apollo-triage-right-t3-3',
+    shipId: 'apollo-triage',
+    bedName: 'Right T3 Bed 3',
+    tier: 'T3 - Basic',
+    location: 'Right Module',
+    status: 'Vacant',
+    medGelCurrent: 200,
+    medGelMax: 200,
+    canisters: 2,
+    respawns: [],
+  },
+  {
+    id: 'c8r-bed-1',
+    shipId: 'c8r',
+    bedName: 'Rescue Bed 1',
+    tier: 'T3 - Basic',
+    location: 'Rescue Cabin',
+    status: 'Vacant',
+    medGelCurrent: 200,
+    medGelMax: 200,
+    canisters: 1,
+    respawns: [],
+  },
+  {
+    id: 'terrapin-bed-1',
+    shipId: 'terrapin',
+    bedName: 'Medical Station 1',
+    tier: 'T3 - Basic',
+    location: 'Armored Rescue Bay',
+    status: 'Vacant',
+    medGelCurrent: 200,
+    medGelMax: 200,
+    canisters: 1,
+    respawns: [],
   },
 ]
 
-const startingOperations = [
-  {
-    operation: 'Phoenix Medical Standby',
-    type: 'QRF',
-    asset: 'Normandy',
-    status: 'Standby',
-    priority: 'Normal',
-  },
-  {
-    operation: 'Beacon Response',
-    type: 'Search and Rescue',
-    asset: 'C8R Pisces Rescue',
-    status: 'Ready',
-    priority: 'High',
-  },
-  {
-    operation: 'MASCAS Support',
-    type: 'Mass Casualty',
-    asset: 'RSI Apollo Triage',
-    status: 'Reserved',
-    priority: 'Critical',
-  },
-  {
-    operation: 'Fleet Medical Escort',
-    type: 'Medical Overwatch',
-    asset: 'RSI Apollo Medivac',
-    status: 'Ready',
-    priority: 'Normal',
-  },
+const startingSupplies = [
+  { id: 'hemozal', name: 'Hemozal', description: 'Haemostatic', quantity: 99 },
+  { id: 'adrenapen', name: 'AdrenaPen', description: 'Adrenaline / stimulant', quantity: 30 },
+  { id: 'detoxpen', name: 'DetoxPen', description: 'Toxin removal', quantity: 30 },
+  { id: 'oxypen', name: 'OxyPen', description: 'Oxygenation', quantity: 40 },
+  { id: 'opiopen', name: 'OpioPen', description: 'Analgesic / pain', quantity: 30 },
+  { id: 'deconpen', name: 'DeconPen', description: 'Decontamination', quantity: 30 },
+  { id: 'corticopen', name: 'CorticoPen', description: 'Corticosteroid', quantity: 30 },
+  { id: 'paramed-device', name: 'Paramed Device', description: 'Para-medical unit', quantity: 8 },
+  { id: 'paramed-refill', name: 'Paramed Refill', description: 'Refill cartridge', quantity: 99 },
+  { id: 'medgel', name: 'MedGel', description: 'Topical healing', quantity: 20 },
 ]
+
+const startingRoster = [
+  { name: 'Mike Ramirez', callsign: 'Phoenix Actual', role: 'Medical Command', status: 'Active' },
+  { name: 'Phoenix Med-1', callsign: 'Med-1', role: 'Corpsman', status: 'Active' },
+  { name: 'Phoenix Med-2', callsign: 'Med-2', role: 'Corpsman', status: 'Standby' },
+  { name: 'Phoenix Pilot-1', callsign: 'Dustoff-1', role: 'CASEVAC Pilot', status: 'Active' },
+]
+
+function loadStoredData(key, fallback) {
+  try {
+    const stored = localStorage.getItem(key)
+    if (!stored) return fallback
+    return JSON.parse(stored)
+  } catch {
+    return fallback
+  }
+}
+
+function formatActivityTime() {
+  const now = new Date()
+  const day = String(now.getDate()).padStart(2, '0')
+  const month = now.toLocaleString('en-US', { month: 'short' })
+  const hour = String(now.getHours()).padStart(2, '0')
+  const minute = String(now.getMinutes()).padStart(2, '0')
+
+  return `${day} ${month} ${hour}:${minute}`
+}
 
 function App() {
-  const [activePage, setActivePage] = useState('Dashboard')
-  const [isAdminMode, setIsAdminMode] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-  return localStorage.getItem('phoenixAuthenticated') === 'true'
-})
-const [accessPin, setAccessPin] = useState('')
-const [bootComplete, setBootComplete] = useState(false)
-
-  const [inventoryItems, setInventoryItems] = useState(() => {
-    const savedInventory = localStorage.getItem('phoenixInventory')
-    if (savedInventory) return JSON.parse(savedInventory)
-    return startingInventoryItems
+    return localStorage.getItem('phoenixAuthenticated') === 'true'
   })
+  const [accessPin, setAccessPin] = useState('')
+  const [bootComplete, setBootComplete] = useState(false)
+  const [isAdminMode, setIsAdminMode] = useState(false)
+  const [activePage, setActivePage] = useState('Beds & Respawns')
+  const [selectedShipId, setSelectedShipId] = useState('idris')
 
-  const [medicalBeds, setMedicalBeds] = useState(() => {
-    const savedBeds = localStorage.getItem('phoenixMedicalBeds')
-    if (savedBeds) return JSON.parse(savedBeds)
-    return startingMedicalBeds
-  })
-
-  const [fleetShips, setFleetShips] = useState(() => {
-    const savedFleet = localStorage.getItem('phoenixFleet')
-    if (savedFleet) return JSON.parse(savedFleet)
-    return startingFleetShips
-  })
-
-  const [operations, setOperations] = useState(() => {
-    const savedOperations = localStorage.getItem('phoenixOperations')
-    if (savedOperations) return JSON.parse(savedOperations)
-    return startingOperations
-  })
-
-  useEffect(() => {
-    localStorage.setItem('phoenixInventory', JSON.stringify(inventoryItems))
-  }, [inventoryItems])
+  const [ships, setShips] = useState(() =>
+    loadStoredData('phoenixShips', startingShips),
+  )
+  const [beds, setBeds] = useState(() =>
+    loadStoredData('phoenixBeds', startingBeds),
+  )
+  const [supplies, setSupplies] = useState(() =>
+    loadStoredData('phoenixSupplies', startingSupplies),
+  )
+  const [activityLog, setActivityLog] = useState(() =>
+    loadStoredData('phoenixActivityLog', []),
+  )
 
   useEffect(() => {
-    localStorage.setItem('phoenixMedicalBeds', JSON.stringify(medicalBeds))
-  }, [medicalBeds])
+    localStorage.setItem('phoenixShips', JSON.stringify(ships))
+  }, [ships])
 
   useEffect(() => {
-    localStorage.setItem('phoenixFleet', JSON.stringify(fleetShips))
-  }, [fleetShips])
+    localStorage.setItem('phoenixBeds', JSON.stringify(beds))
+  }, [beds])
 
   useEffect(() => {
-    localStorage.setItem('phoenixOperations', JSON.stringify(operations))
-  }, [operations])
+    localStorage.setItem('phoenixSupplies', JSON.stringify(supplies))
+  }, [supplies])
 
   useEffect(() => {
-  const bootTimer = setTimeout(() => {
-    setBootComplete(true)
-  }, 2800)
+    localStorage.setItem('phoenixActivityLog', JSON.stringify(activityLog))
+  }, [activityLog])
 
-  return () => clearTimeout(bootTimer)
-}, [])
+  useEffect(() => {
+    if (isAuthenticated) return
 
-  const activePersonnel = personnelRoster.filter(
-    (member) => member.status === 'Active',
+    const timer = setTimeout(() => {
+      setBootComplete(true)
+    }, 3200)
+
+    return () => clearTimeout(timer)
+  }, [isAuthenticated])
+
+  const selectedShip =
+    ships.find((ship) => ship.id === selectedShipId) || ships[0]
+
+  const shipBeds = beds.filter((bed) => bed.shipId === selectedShipId)
+
+  const occupiedBeds = beds.filter(
+    (bed) => bed.status === 'Occupied' || bed.respawns.length > 0,
   ).length
 
-  const shipsReady = fleetShips.filter((ship) => ship.status === 'Ready').length
+  const boxesLowOnStock = supplies.filter((item) => item.quantity <= 10).length
 
-  const pendingRequests = operations.filter(
-    (mission) => mission.status === 'Standby' || mission.status === 'Reserved',
-  ).length
+  function addActivity(message, shipId = selectedShipId, icon = '✦') {
+    const ship = ships.find((item) => item.id === shipId)
+
+    const entry = {
+      id: crypto.randomUUID(),
+      icon,
+      message,
+      ship: ship?.name || 'Phoenix Medical',
+      time: formatActivityTime(),
+    }
+
+    setActivityLog((currentLog) => [entry, ...currentLog].slice(0, 100))
+  }
 
   function authenticatePortal(event) {
     event.preventDefault()
@@ -550,6 +418,7 @@ const [bootComplete, setBootComplete] = useState(false)
     localStorage.removeItem('phoenixAuthenticated')
     setIsAuthenticated(false)
     setIsAdminMode(false)
+    setBootComplete(false)
   }
 
   function toggleAdminMode() {
@@ -567,60 +436,67 @@ const [bootComplete, setBootComplete] = useState(false)
     }
   }
 
+  function clearAllRespawnsForShip(shipId) {
+    const ship = ships.find((item) => item.id === shipId)
+
+    setBeds((currentBeds) =>
+      currentBeds.map((bed) =>
+        bed.shipId === shipId
+          ? {
+              ...bed,
+              respawns: [],
+              status: bed.status === 'Occupied' ? 'Vacant' : bed.status,
+            }
+          : bed,
+      ),
+    )
+
+    addActivity(
+      `All respawn imprints cleared from ${ship?.name || 'ship'}`,
+      shipId,
+      '🧹',
+    )
+  }
+
   function renderPage() {
-    if (activePage === 'Dashboard') {
+    if (activePage === 'Beds & Respawns') {
       return (
-        <Dashboard
-          activePersonnel={activePersonnel}
-          shipsReady={shipsReady}
-          pendingRequests={pendingRequests}
-          inventoryItems={inventoryItems}
-          fleetShips={fleetShips}
-          medicalBeds={medicalBeds}
-          operations={operations}
+        <BedsAndRespawns
+          selectedShip={selectedShip}
+          beds={shipBeds}
+          isAdminMode={isAdminMode}
+          setBeds={setBeds}
+          addActivity={addActivity}
+          clearAllRespawnsForShip={clearAllRespawnsForShip}
         />
       )
     }
 
-    if (activePage === 'Personnel') {
-      return <Personnel />
+    if (activePage === 'Ship Supplies') {
+      return <ShipSupplies supplies={supplies} />
     }
 
-    if (activePage === 'Fleet') {
+    if (activePage === 'Supply Issue') {
       return (
-        <Fleet
-          fleetShips={fleetShips}
-          setFleetShips={setFleetShips}
+        <SupplyIssue
+          ships={ships}
+          supplies={supplies}
+          setSupplies={setSupplies}
+          addActivity={addActivity}
           isAdminMode={isAdminMode}
         />
       )
     }
 
-    if (activePage === 'Inventory') {
-      return (
-        <Inventory
-          inventoryItems={inventoryItems}
-          setInventoryItems={setInventoryItems}
-          isAdminMode={isAdminMode}
-        />
-      )
+    if (activePage === 'Medic Roster') {
+      return <MedicRoster />
     }
 
-    if (activePage === 'Medical Beds') {
+    if (activePage === 'Activity Log') {
       return (
-        <MedicalBeds
-          medicalBeds={medicalBeds}
-          setMedicalBeds={setMedicalBeds}
-          isAdminMode={isAdminMode}
-        />
-      )
-    }
-
-    if (activePage === 'Operations') {
-      return (
-        <Operations
-          operations={operations}
-          setOperations={setOperations}
+        <ActivityLog
+          activityLog={activityLog}
+          clearLog={() => setActivityLog([])}
           isAdminMode={isAdminMode}
         />
       )
@@ -629,10 +505,10 @@ const [bootComplete, setBootComplete] = useState(false)
     if (activePage === 'Reports') {
       return (
         <Reports
-          inventoryItems={inventoryItems}
-          fleetShips={fleetShips}
-          medicalBeds={medicalBeds}
-          operations={operations}
+          ships={ships}
+          beds={beds}
+          supplies={supplies}
+          activityLog={activityLog}
         />
       )
     }
@@ -641,279 +517,736 @@ const [bootComplete, setBootComplete] = useState(false)
   }
 
   if (!isAuthenticated) {
-  return (
-    <div className="login-screen terminal-login">
-      {!bootComplete ? (
-        <div className="terminal-frame boot-only">
-          <div className="terminal-topline">
-            <span>PHOENIX MEDICAL COMMAND</span>
-            <span>SECURE ACCESS NODE</span>
-          </div>
+    return (
+      <div className="login-screen">
+        {!bootComplete ? (
+          <div className="boot-console">
+            <div className="boot-header">
+              <span>PHOENIX MED BAY</span>
+              <small>v1.0</small>
+            </div>
 
-          <div className="terminal-code-panel full-terminal">
-            <p className="terminal-line line-1">
-              &gt; INITIALIZING PHOENIX MEDICAL INTERFACE...
-            </p>
-            <p className="terminal-line line-2">
-              &gt; VERIFYING FLEET MEDICAL ASSETS...
-            </p>
-            <p className="terminal-line line-3">
-              &gt; SYNCING IDRIS MEDICAL BAY...
-            </p>
-            <p className="terminal-line line-4">
-              &gt; LOADING APOLLO MODULE CONFIGURATIONS...
-            </p>
-            <p className="terminal-line line-5">
-              &gt; CHECKING C8R AND TERRAPIN MEDICAL READINESS...
-            </p>
-            <p className="terminal-line line-6">
-              &gt; CLASSIFICATION: RESTRICTED
-            </p>
-            <p className="terminal-line line-7">
-              &gt; AUTHENTICATION REQUIRED
-            </p>
+            <div className="boot-lines">
+              <p className="boot-line boot-1">
+                &gt; CONNECTING TO PHOENIX MEDICAL COMMAND...
+              </p>
+              <p className="boot-line boot-2">
+                &gt; VERIFYING FLEET MEDICAL ASSETS...
+              </p>
+              <p className="boot-line boot-3">
+                &gt; LOADING IDRIS MEDICAL BAY...
+              </p>
+              <p className="boot-line boot-4">
+                &gt; LOADING APOLLO MODULE CONFIGURATIONS...
+              </p>
+              <p className="boot-line boot-5">
+                &gt; CHECKING C8R / TERRAPIN MEDICAL READINESS...
+              </p>
+              <p className="boot-line boot-6">
+                &gt; SYNCING SHIP SUPPLIES...
+              </p>
+              <p className="boot-line boot-7">
+                &gt; CLASSIFICATION: RESTRICTED
+              </p>
+              <p className="boot-line boot-8">
+                &gt; AUTHENTICATION REQUIRED
+              </p>
+            </div>
 
-            <div className="connecting-box boot-connecting">
-              <span className="scanner-dot"></span>
-              CONNECTING...
+            <div className="boot-footer">
+              <span>STATION: PHOENIX SQUADRON MEDICAL</span>
+              <span>STATUS: CONNECTING...</span>
             </div>
           </div>
-
-          <div className="terminal-bottomline">
-            <span>STATION: PHOENIX SQUADRON MEDICAL</span>
-            <span>STATUS: CONNECTING</span>
-          </div>
-        </div>
-      ) : (
-        <div className="login-card login-only-card">
-          <img
-            className="login-logo"
-            src={phoenixLogo}
-            alt="Phoenix Squadron Medical logo"
-          />
-
-          <p className="eyebrow">Restricted Medical System</p>
-          <h1>Phoenix Squadron Medical</h1>
-
-          <p className="login-subtitle">
-            Medical response interface locked. Enter access PIN to load
-            inventory, fleet assets, operations, and shipboard medical beds.
-          </p>
-
-          <form className="login-form" onSubmit={authenticatePortal}>
-            <input
-              type="password"
-              placeholder="Enter access PIN"
-              value={accessPin}
-              onChange={(event) => setAccessPin(event.target.value)}
-              autoFocus
+        ) : (
+          <div className="login-shell">
+            <img
+              className="login-emblem"
+              src={phoenixLogo}
+              alt="Phoenix Squadron Medical logo"
             />
 
-            <button className="admin-button" type="submit">
-              Authenticate
-            </button>
-          </form>
+            <form className="login-card" onSubmit={authenticatePortal}>
+              <p className="login-kicker">Phoenix Squadron</p>
+              <h1>Phoenix Med Bay</h1>
+              <p className="login-subtitle">Medical Response Command</p>
 
-          <div className="login-footer">
-            <span>CLASSIFICATION: RESTRICTED</span>
-            <span>PHOENIX MEDICAL COMMAND</span>
+              <input
+                type="password"
+                placeholder="ACCESS CODE"
+                value={accessPin}
+                onChange={(event) => setAccessPin(event.target.value)}
+                autoFocus
+              />
+
+              <button type="submit">Authenticate</button>
+            </form>
           </div>
-        </div>
-      )}
-    </div>
-  )
-}
+        )}
+      </div>
+    )
+  }
 
   return (
-    <div className="app">
-      <aside className="sidebar">
-        <div className="brand">
-          <img
-            className="logo-image"
-            src={phoenixLogo}
-            alt="Phoenix Squadron Medical logo"
-          />
+    <div className="console-app">
+      <TopBar
+        ships={ships}
+        supplies={supplies}
+        occupiedBeds={occupiedBeds}
+        totalBeds={beds.length}
+        boxesLowOnStock={boxesLowOnStock}
+      />
 
+      <aside className="console-sidebar">
+        <div className="sidebar-brand">
+          <img src={phoenixLogo} alt="Phoenix Squadron Medical logo" />
           <div>
-            <h1>Phoenix Medical</h1>
-            <p>Rapid Response Command</p>
+            <h1>Phoenix Med Bay</h1>
+            <span>Medical Command</span>
           </div>
         </div>
 
-        <button className="mode-button" onClick={toggleAdminMode}>
-  {isAdminMode ? 'Admin Mode' : 'View Mode'}
-</button>
+        <div className="sidebar-section-title">Fleet Ships</div>
 
-<button className="logout-button" onClick={logoutPortal}>
-  Logout
-</button>
+        <div className="ship-list">
+          {ships.map((ship) => (
+            <button
+              key={ship.id}
+              className={
+                selectedShipId === ship.id ? 'ship-button active' : 'ship-button'
+              }
+              onClick={() => setSelectedShipId(ship.id)}
+            >
+              <span>{ship.name}</span>
+              <small>{ship.status}</small>
+            </button>
+          ))}
+        </div>
 
-<nav>
+        <div className="sidebar-section-title">Operations</div>
+
+        <nav className="console-nav">
           {pages.map((page) => (
             <button
               key={page}
-              className={activePage === page ? 'nav-item active' : 'nav-item'}
+              className={activePage === page ? 'nav-link active' : 'nav-link'}
               onClick={() => setActivePage(page)}
             >
               {page}
             </button>
           ))}
         </nav>
+
+        <div className="sidebar-bottom">
+          <button className="sidebar-control" onClick={toggleAdminMode}>
+            {isAdminMode ? 'Admin Mode' : 'View Mode'}
+          </button>
+
+          <button className="sidebar-control danger" onClick={logoutPortal}>
+            Logout
+          </button>
+        </div>
       </aside>
 
-      <main className="main">{renderPage()}</main>
+      <main className="console-main">{renderPage()}</main>
+    </div>
+  )
+}
 
-      <div className="system-bar">
-        <span>Phoenix Squadron Medical Portal</span>
-        <span>Mode: {isAdminMode ? 'Admin' : 'View'}</span>
-        <span>System: Online</span>
-        <span>Last Updated: {new Date().toLocaleTimeString()}</span>
-        <button className="system-link" onClick={logoutPortal}>
-          Logout
+function TopBar({ ships, supplies, occupiedBeds, totalBeds, boxesLowOnStock }) {
+  const activeShips = ships.filter((ship) => ship.status === 'Active').length
+  const totalSupplies = supplies.reduce((sum, item) => sum + item.quantity, 0)
+
+  return (
+    <header className="top-bar">
+      <div className="top-title">
+        <span>Phoenix Med Bay</span>
+        <small>v1.0</small>
+      </div>
+
+      <div className="top-classification">
+        Classification: Restricted • Phoenix Squadron Medical
+      </div>
+
+      <div className="top-sync">
+        <span className="sync-dot"></span>
+        Live Sync
+      </div>
+
+      <div className="top-stat">
+        <span>Fleet Ships</span>
+        <strong>{activeShips}</strong>
+      </div>
+
+      <div className="top-stat">
+        <span>Supply Items</span>
+        <strong>{totalSupplies}</strong>
+      </div>
+
+      <div className="top-stat">
+        <span>Boxes Low</span>
+        <strong>{boxesLowOnStock}</strong>
+      </div>
+
+      <div className="top-stat">
+        <span>Beds Occupied</span>
+        <strong>
+          {occupiedBeds} / {totalBeds}
+        </strong>
+      </div>
+    </header>
+  )
+}
+
+function BedsAndRespawns({
+  selectedShip,
+  beds,
+  isAdminMode,
+  setBeds,
+  addActivity,
+  clearAllRespawnsForShip,
+}) {
+  const [viewMode, setViewMode] = useState('List View')
+  const [draftBeds, setDraftBeds] = useState({})
+
+  useEffect(() => {
+    const nextDrafts = {}
+
+    beds.forEach((bed) => {
+      nextDrafts[bed.id] = {
+        medGelCurrent: bed.medGelCurrent,
+        medGelMax: bed.medGelMax,
+        canisters: bed.canisters,
+        newRespawnName: '',
+      }
+    })
+
+    setDraftBeds(nextDrafts)
+  }, [beds])
+
+  function updateDraft(bedId, field, value) {
+    setDraftBeds((currentDrafts) => ({
+      ...currentDrafts,
+      [bedId]: {
+        ...currentDrafts[bedId],
+        [field]: value,
+      },
+    }))
+  }
+
+  function saveBedSupply(bed) {
+    const draft = draftBeds[bed.id]
+
+    setBeds((currentBeds) =>
+      currentBeds.map((item) =>
+        item.id === bed.id
+          ? {
+              ...item,
+              medGelCurrent: Math.max(0, Number(draft.medGelCurrent) || 0),
+              medGelMax: Math.max(1, Number(draft.medGelMax) || 1),
+              canisters: Math.max(0, Number(draft.canisters) || 0),
+            }
+          : item,
+      ),
+    )
+
+    addActivity(
+      `${bed.bedName} MedGel updated on ${selectedShip.name}`,
+      selectedShip.id,
+      '🧪',
+    )
+  }
+
+  function updateBedStatus(bed, newStatus) {
+    setBeds((currentBeds) =>
+      currentBeds.map((item) =>
+        item.id === bed.id ? { ...item, status: newStatus } : item,
+      ),
+    )
+
+    addActivity(
+      `${selectedShip.name} ${bed.bedName} status set to ${newStatus}`,
+      selectedShip.id,
+      '🚦',
+    )
+  }
+
+  function addRespawn(bed) {
+    const draftName = draftBeds[bed.id]?.newRespawnName?.trim()
+
+    if (!draftName) return
+
+    setBeds((currentBeds) =>
+      currentBeds.map((item) =>
+        item.id === bed.id
+          ? {
+              ...item,
+              status: 'Occupied',
+              respawns: [...item.respawns, draftName],
+            }
+          : item,
+      ),
+    )
+
+    updateDraft(bed.id, 'newRespawnName', '')
+
+    addActivity(
+      `${draftName} set respawn on ${selectedShip.name} ${bed.bedName}`,
+      selectedShip.id,
+      '🛏️',
+    )
+  }
+
+  function removeRespawn(bed, respawnName) {
+    setBeds((currentBeds) =>
+      currentBeds.map((item) => {
+        if (item.id !== bed.id) return item
+
+        const remainingRespawns = item.respawns.filter(
+          (name) => name !== respawnName,
+        )
+
+        return {
+          ...item,
+          respawns: remainingRespawns,
+          status: remainingRespawns.length > 0 ? item.status : 'Vacant',
+        }
+      }),
+    )
+
+    addActivity(
+      `${respawnName} removed from ${selectedShip.name} ${bed.bedName}`,
+      selectedShip.id,
+      '🔓',
+    )
+  }
+  function useMedGel(bed, amount, reason) {
+    setBeds((currentBeds) =>
+      currentBeds.map((item) =>
+        item.id === bed.id
+          ? {
+              ...item,
+              medGelCurrent: Math.max(0, item.medGelCurrent - amount),
+            }
+          : item,
+      ),
+    )
+
+    addActivity(
+      `${selectedShip.name} ${bed.bedName}: ${reason} used ${amount} cSCU MedGel`,
+      selectedShip.id,
+      '🧪',
+    )
+  }
+
+  function loadIntoTank(bed) {
+    if (bed.canisters <= 0 || bed.medGelCurrent >= bed.medGelMax) return
+
+    setBeds((currentBeds) =>
+      currentBeds.map((item) =>
+        item.id === bed.id
+          ? {
+              ...item,
+              canisters: Math.max(0, item.canisters - 1),
+              medGelCurrent: item.medGelMax,
+            }
+          : item,
+      ),
+    )
+
+    addActivity(
+      `${selectedShip.name} ${bed.bedName}: loaded one canister into tank`,
+      selectedShip.id,
+      '📦',
+    )
+  }
+
+  function returnToBox(bed) {
+    setBeds((currentBeds) =>
+      currentBeds.map((item) =>
+        item.id === bed.id
+          ? {
+              ...item,
+              canisters: item.canisters + 1,
+            }
+          : item,
+      ),
+    )
+
+    addActivity(
+      `${selectedShip.name} ${bed.bedName}: returned one canister to box`,
+      selectedShip.id,
+      '📦',
+    )
+  }
+  return (
+    <section className="console-panel">
+      <div className="panel-command-row">
+        <div>
+          <p className="section-kicker">Fleet • {selectedShip.name}</p>
+          <h2>Beds & Respawns</h2>
+        </div>
+
+        <div className="panel-actions">
+          {isAdminMode && (
+            <button
+              className="console-button danger"
+              onClick={() => clearAllRespawnsForShip(selectedShip.id)}
+            >
+              Clear Imprints
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="console-tabs">
+        <button
+          className={viewMode === 'List View' ? 'active' : ''}
+          onClick={() => setViewMode('List View')}
+        >
+          List View
         </button>
+
+        <button
+          className={viewMode === 'Floor Plan' ? 'active' : ''}
+          onClick={() => setViewMode('Floor Plan')}
+        >
+          Floor Plan
+        </button>
+      </div>
+
+      {viewMode === 'Floor Plan' ? (
+        <FloorPlan selectedShip={selectedShip} beds={beds} />
+      ) : (
+        <div className="bed-console-grid">
+          {beds.map((bed) => (
+                        <BedConsoleCard
+              key={bed.id}
+              bed={bed}
+              draft={draftBeds[bed.id]}
+              isAdminMode={isAdminMode}
+              updateDraft={updateDraft}
+              saveBedSupply={saveBedSupply}
+              updateBedStatus={updateBedStatus}
+              addRespawn={addRespawn}
+              removeRespawn={removeRespawn}
+              useMedGel={useMedGel}
+              loadIntoTank={loadIntoTank}
+              returnToBox={returnToBox}
+            />
+          ))}
+        </div>
+      )}
+    </section>
+  )
+}
+
+function BedConsoleCard({
+  bed,
+  draft,
+  isAdminMode,
+  updateDraft,
+  saveBedSupply,
+  updateBedStatus,
+  addRespawn,
+  removeRespawn,
+  useMedGel,
+  loadIntoTank,
+  returnToBox,
+}) {
+  const medGelCurrent = Number(draft?.medGelCurrent ?? bed.medGelCurrent)
+  const medGelMax = Number(draft?.medGelMax ?? bed.medGelMax)
+  const canisters = Number(draft?.canisters ?? bed.canisters)
+  const medGelPercent = Math.min(
+    100,
+    Math.max(0, (medGelCurrent / medGelMax) * 100),
+  )
+
+  const injuryUse = bed.tier.startsWith('T2') ? 10 : 5
+  const totalStored = canisters * medGelMax
+
+  return (
+    <article className="bed-console-card">
+      <div className="bed-card-header">
+        <span>{bed.bedName}</span>
+
+        <div className="bed-card-badges">
+          <strong>{bed.tier}</strong>
+          <em>{bed.status}</em>
+        </div>
+      </div>
+
+      <div className="bed-location">{bed.location}</div>
+
+      <div className="medgel-row">
+        <span>MedGel — Tank</span>
+        <strong>
+          {medGelCurrent} / {medGelMax} cSCU
+        </strong>
+      </div>
+
+      <div className="medgel-track">
+        <div className="medgel-fill" style={{ width: `${medGelPercent}%` }} />
+      </div>
+
+      <div className="bed-action-grid">
+        <button
+          type="button"
+          className="bed-tile"
+          onClick={() =>
+            useMedGel(
+              bed,
+              injuryUse,
+              `${bed.tier.startsWith('T2') ? 'T2' : 'T3'} injury`,
+            )
+          }
+        >
+          <span>{bed.tier.startsWith('T2') ? 'T2' : 'T3'} injury</span>
+          <small>-{injuryUse} cSCU</small>
+        </button>
+
+        <button
+          type="button"
+          className="bed-tile"
+          onClick={() => useMedGel(bed, 100, 'Respawn')}
+        >
+          <span>Respawn</span>
+          <small>-100 cSCU</small>
+        </button>
+      </div>
+
+      <div className="bed-storage">
+        <span>Bed Storage</span>
+        <strong>{canisters} canisters stored</strong>
+      </div>
+
+      <div className="bed-storage-grid">
+        <div className="bed-tile storage-display">
+          <span>📦 → Bed Storage</span>
+          <small>{canisters} in box</small>
+        </div>
+
+        <button
+          type="button"
+          className="bed-tile"
+          onClick={() => loadIntoTank(bed)}
+          disabled={bed.canisters <= 0 || bed.medGelCurrent >= bed.medGelMax}
+        >
+          <span>Load into tank</span>
+          <small>fills to {bed.medGelMax} cSCU</small>
+        </button>
+
+        <button
+          type="button"
+          className="bed-tile"
+          onClick={() => returnToBox(bed)}
+        >
+          <span>Return to box</span>
+          <small>+1 to box stock</small>
+        </button>
+      </div>
+
+      <div className="bed-storage-note">
+        • {canisters} × canister ({totalStored} cSCU total stored)
+      </div>
+
+      {isAdminMode && (
+        <div className="bed-admin-controls">
+          <label>
+            Current
+            <input
+              type="number"
+              value={draft?.medGelCurrent ?? bed.medGelCurrent}
+              onChange={(event) =>
+                updateDraft(bed.id, 'medGelCurrent', event.target.value)
+              }
+            />
+          </label>
+
+          <label>
+            Max
+            <input
+              type="number"
+              value={draft?.medGelMax ?? bed.medGelMax}
+              onChange={(event) =>
+                updateDraft(bed.id, 'medGelMax', event.target.value)
+              }
+            />
+          </label>
+
+          <label>
+            Canisters
+            <input
+              type="number"
+              value={draft?.canisters ?? bed.canisters}
+              onChange={(event) =>
+                updateDraft(bed.id, 'canisters', event.target.value)
+              }
+            />
+          </label>
+
+          <button type="button" onClick={() => saveBedSupply(bed)}>
+            Save
+          </button>
+
+          <select
+            value={bed.status}
+            onChange={(event) => updateBedStatus(bed, event.target.value)}
+          >
+            <option>Vacant</option>
+            <option>Occupied</option>
+            <option>Reserved</option>
+            <option>Offline</option>
+          </select>
+        </div>
+      )}
+
+      <div className="respawn-section">
+        <div className="respawn-header">
+          <span>Respawns ({bed.respawns.length})</span>
+        </div>
+
+        {bed.respawns.map((respawnName) => (
+          <div className="respawn-row" key={respawnName}>
+            <span>{respawnName}</span>
+
+            {isAdminMode && (
+              <button type="button" onClick={() => removeRespawn(bed, respawnName)}>
+                ×
+              </button>
+            )}
+          </div>
+        ))}
+
+        {isAdminMode && (
+          <div className="respawn-row input-row">
+            <input
+              placeholder="Player name..."
+              value={draft?.newRespawnName || ''}
+              onChange={(event) =>
+                updateDraft(bed.id, 'newRespawnName', event.target.value)
+              }
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') {
+                  event.preventDefault()
+                  addRespawn(bed)
+                }
+              }}
+            />
+
+            <button type="button" onClick={() => addRespawn(bed)}>
+              + Add
+            </button>
+          </div>
+        )}
+
+        {!isAdminMode && bed.respawns.length === 0 && (
+          <p className="empty-text">No respawns set</p>
+        )}
+      </div>
+    </article>
+  )
+}
+
+function FloorPlan({ selectedShip, beds }) {
+  if (selectedShip?.id === 'idris') {
+    const t3Beds = beds.filter((bed) => bed.tier.startsWith('T3')).slice(0, 4)
+    const t2Bed = beds.find((bed) => bed.tier.startsWith('T2'))
+
+    return (
+      <div className="floor-plan idris-floor-plan">
+        <div className="idris-floor-left">
+          <div className="floor-zone-title">Ward</div>
+
+          <div className="idris-floor-grid">
+            {t3Beds.map((bed) => (
+              <div className="floor-bed floor-bed-t3" key={bed.id}>
+                <strong>{bed.bedName}</strong>
+                <span>{bed.tier}</span>
+                <small>
+                  {bed.medGelCurrent}/{bed.medGelMax}
+                </small>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="idris-floor-center">
+          <span>Medical Office</span>
+        </div>
+
+        <div className="idris-floor-right">
+          <div className="floor-zone-title">Operating Theatre</div>
+
+          {t2Bed && (
+            <div className="floor-bed floor-bed-t2">
+              <strong>{t2Bed.bedName}</strong>
+              <span>{t2Bed.tier}</span>
+              <small>
+                {t2Bed.medGelCurrent}/{t2Bed.medGelMax}
+              </small>
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  const halfway = Math.ceil(beds.length / 2)
+
+  return (
+    <div className="floor-plan">
+      <div className="floor-zone floor-left">
+        {beds.slice(0, halfway).map((bed) => (
+          <div className="floor-bed" key={bed.id}>
+            <strong>{bed.bedName}</strong>
+            <span>{bed.tier}</span>
+            <small>
+              {bed.medGelCurrent}/{bed.medGelMax}
+            </small>
+          </div>
+        ))}
+      </div>
+
+      <div className="floor-center">
+        <span>{selectedShip.name}</span>
+        <em>Medical Office / Access Corridor</em>
+      </div>
+
+      <div className="floor-zone floor-right">
+        {beds.slice(halfway).map((bed) => (
+          <div className="floor-bed" key={bed.id}>
+            <strong>{bed.bedName}</strong>
+            <span>{bed.tier}</span>
+            <small>
+              {bed.medGelCurrent}/{bed.medGelMax}
+            </small>
+          </div>
+        ))}
       </div>
     </div>
   )
 }
 
-function Dashboard({
-  activePersonnel,
-  shipsReady,
-  pendingRequests,
-  inventoryItems,
-  fleetShips,
-  medicalBeds,
-  operations,
-}) {
-  const lowStockItems = inventoryItems.filter((item) => item.quantity <= 30)
-  const offlineShips = fleetShips.filter((ship) => ship.status === 'Offline')
-  const criticalOperations = operations.filter(
-    (mission) => mission.priority === 'Critical',
-  )
-  const activeBeds = medicalBeds.filter(
-    (bed) => bed.status === 'Occupied' || bed.status === 'Reserved',
-  )
-
+function ShipSupplies({ supplies }) {
   return (
-    <>
-      <section className="hero hero-with-logo">
-        <div className="hero-text">
-          <p className="eyebrow">Rapid Medical Response Command</p>
-          <h2>Phoenix Squadron Medical Portal</h2>
-          <p>
-            Operational dashboard for medical readiness, assigned beds, fleet
-            status, and field response coordination.
-          </p>
-        </div>
-
-        <img
-          className="hero-logo"
-          src={phoenixLogo}
-          alt="Phoenix Squadron Medical logo"
-        />
-      </section>
-
-      <section className="status-grid">
-        <div className="card">
-          <span>Medical Readiness</span>
-          <h3>GREEN</h3>
-          <p>All core medical systems are online.</p>
-        </div>
-
-        <div className="card">
-          <span>Active Personnel</span>
-          <h3>{activePersonnel}</h3>
-          <p>Available medical personnel currently listed as active.</p>
-        </div>
-
-        <div className="card">
-          <span>Ships Ready</span>
-          <h3>{shipsReady}</h3>
-          <p>Medical fleet assets marked ready for deployment.</p>
-        </div>
-
-        <div className="card">
-          <span>Pending Operations</span>
-          <h3>{pendingRequests}</h3>
-          <p>Operations currently standing by or reserved.</p>
-        </div>
-      </section>
-
-      <section className="summary-grid">
-        <div className="summary-item">
-          <span>Low Stock</span>
-          <strong>{lowStockItems.length}</strong>
-          <p>
-            {lowStockItems.length > 0
-              ? lowStockItems.map((item) => item.item).join(', ')
-              : 'No supply warnings detected.'}
-          </p>
-        </div>
-
-        <div className="summary-item">
-          <span>Offline Ships</span>
-          <strong>{offlineShips.length}</strong>
-          <p>
-            {offlineShips.length > 0
-              ? offlineShips.map((ship) => ship.name).join(', ')
-              : 'No offline ships reported.'}
-          </p>
-        </div>
-
-        <div className="summary-item">
-          <span>Critical Operations</span>
-          <strong>{criticalOperations.length}</strong>
-          <p>
-            {criticalOperations.length > 0
-              ? criticalOperations
-                  .map((mission) => mission.operation)
-                  .join(', ')
-              : 'No critical operations active.'}
-          </p>
-        </div>
-
-        <div className="summary-item">
-          <span>Reserved / Occupied Beds</span>
-          <strong>{activeBeds.length}</strong>
-          <p>
-            {activeBeds.length > 0
-              ? activeBeds.map((bed) => bed.bed).join(', ')
-              : 'Medical beds are clear.'}
-          </p>
-        </div>
-      </section>
-    </>
-  )
-}
-
-function Personnel() {
-  return (
-    <section className="panel">
-      <div className="panel-header">
+    <section className="console-panel">
+      <div className="panel-command-row">
         <div>
-          <p className="eyebrow">Medical Roster</p>
-          <h3>Personnel</h3>
+          <p className="section-kicker">Inventory</p>
+          <h2>Ship Supplies</h2>
         </div>
-
-        <span className="tag">Read Only</span>
       </div>
 
-      <div className="table">
-        <div className="table-row table-head">
-          <span>Name</span>
-          <span>Callsign</span>
-          <span>Role</span>
-          <span>Status</span>
-        </div>
+      <div className="supply-list">
+        {supplies.map((item) => (
+          <div className="supply-row" key={item.id}>
+            <div>
+              <strong>{item.name}</strong>
+              <span>{item.description}</span>
+            </div>
 
-        {personnelRoster.map((member) => (
-          <div className="table-row" key={member.callsign}>
-            <span>{member.name}</span>
-            <span>{member.callsign}</span>
-            <span>{member.role}</span>
-            <span className={getStatusClass(member.status)}>
-              {member.status}
-            </span>
+            <em>{item.quantity} in stock</em>
           </div>
         ))}
       </div>
@@ -921,299 +1254,182 @@ function Personnel() {
   )
 }
 
-function Fleet({ fleetShips, setFleetShips, isAdminMode }) {
-  function updateFleetShip(index, field, value) {
-    const updatedFleet = fleetShips.map((ship, shipIndex) => {
-      if (shipIndex === index) {
-        return {
-          ...ship,
-          [field]: value,
-        }
-      }
+function SupplyIssue({ ships, supplies, setSupplies, addActivity, isAdminMode }) {
+  const [selectedShipId, setSelectedShipId] = useState(ships[0]?.id || 'idris')
+  const [issuingMedic, setIssuingMedic] = useState('')
+  const [recipient, setRecipient] = useState('')
+  const [operationName, setOperationName] = useState('')
+  const [issueQuantities, setIssueQuantities] = useState({})
 
-      return ship
-    })
-
-    setFleetShips(updatedFleet)
+  function changeIssueQuantity(itemId, amount) {
+    setIssueQuantities((current) => ({
+      ...current,
+      [itemId]: Math.max(0, (current[itemId] || 0) + amount),
+    }))
   }
 
-  function resetFleet() {
-    setFleetShips(startingFleetShips)
+  function clearForm() {
+    setIssuingMedic('')
+    setRecipient('')
+    setOperationName('')
+    setIssueQuantities({})
   }
 
-  return (
-    <section className="panel">
-      <div className="panel-header">
-        <div>
-          <p className="eyebrow">Medical Fleet</p>
-          <h3>Fleet Status</h3>
-        </div>
-
-        <div className="panel-actions">
-          {isAdminMode && (
-            <button className="admin-button" onClick={resetFleet}>
-              Reset Fleet
-            </button>
-          )}
-
-          <span className="tag">{isAdminMode ? 'Admin Mode' : 'View Mode'}</span>
-        </div>
-      </div>
-
-      <div className="table">
-        <div className="table-row table-head">
-          <span>Ship</span>
-          <span>Role</span>
-          <span>Assignment</span>
-          <span>Status</span>
-        </div>
-
-        {fleetShips.map((ship, index) => (
-          <div className="table-row" key={ship.name}>
-            <span>{ship.name}</span>
-            <span>{ship.role}</span>
-            <span>
-              {isAdminMode ? (
-                <input
-                  className="inline-input"
-                  value={ship.assignment}
-                  onChange={(event) =>
-                    updateFleetShip(index, 'assignment', event.target.value)
-                  }
-                />
-              ) : (
-                ship.assignment
-              )}
-            </span>
-            <span>
-              {isAdminMode ? (
-                <select
-                  className={`status-select ${getStatusClass(ship.status)}`}
-                  value={ship.status}
-                  onChange={(event) =>
-                    updateFleetShip(index, 'status', event.target.value)
-                  }
-                >
-                  <option>Ready</option>
-                  <option>Standby</option>
-                  <option>Reserved</option>
-                  <option>Offline</option>
-                </select>
-              ) : (
-                <span className={getStatusClass(ship.status)}>
-                  {ship.status}
-                </span>
-              )}
-            </span>
-          </div>
-        ))}
-      </div>
-    </section>
-  )
-}
-
-function Inventory({ inventoryItems, setInventoryItems, isAdminMode }) {
-  const [searchTerm, setSearchTerm] = useState('')
-  const [newItem, setNewItem] = useState('')
-  const [newCategory, setNewCategory] = useState('Medical Supply')
-  const [newQuantity, setNewQuantity] = useState('')
-
-  const filteredItems = inventoryItems.filter((item) => {
-    const searchText = `${item.item} ${item.category} ${item.status}`
-      .toLowerCase()
-      .trim()
-
-    return searchText.includes(searchTerm.toLowerCase())
-  })
-
-  function updateQuantity(itemName, amount) {
-    const updatedItems = inventoryItems.map((item) => {
-      if (item.item === itemName) {
-        return {
-          ...item,
-          quantity: Math.max(0, item.quantity + amount),
-        }
-      }
-
-      return item
-    })
-
-    setInventoryItems(updatedItems)
-  }
-
-  function updateStatus(itemName, newStatus) {
-    const updatedItems = inventoryItems.map((item) => {
-      if (item.item === itemName) {
-        return {
-          ...item,
-          status: newStatus,
-        }
-      }
-
-      return item
-    })
-
-    setInventoryItems(updatedItems)
-  }
-
-  function addInventoryItem(event) {
+  function submitIssueLog(event) {
     event.preventDefault()
 
-    if (!newItem.trim() || !newQuantity) return
-
-    const addedItem = {
-      item: newItem.trim(),
-      category: newCategory,
-      quantity: Number(newQuantity),
-      status: 'In Stock',
+    if (!isAdminMode) {
+      window.alert('Admin Mode required to issue supplies.')
+      return
     }
 
-    setInventoryItems([...inventoryItems, addedItem])
-    setNewItem('')
-    setNewCategory('Medical Supply')
-    setNewQuantity('')
-  }
+    const issuedItems = supplies.filter((item) => issueQuantities[item.id] > 0)
 
-  function deleteInventoryItem(itemName) {
-    const updatedItems = inventoryItems.filter((item) => item.item !== itemName)
-    setInventoryItems(updatedItems)
-  }
+    if (!issuingMedic.trim() || !recipient.trim() || issuedItems.length === 0) {
+      window.alert('Medic, recipient, and at least one supply item are required.')
+      return
+    }
 
-  function resetInventory() {
-    setInventoryItems(startingInventoryItems)
+    setSupplies((currentSupplies) =>
+      currentSupplies.map((item) => ({
+        ...item,
+        quantity: Math.max(0, item.quantity - (issueQuantities[item.id] || 0)),
+      })),
+    )
+
+    const issuedSummary = issuedItems
+      .map((item) => `${issueQuantities[item.id]} ${item.name}`)
+      .join(', ')
+
+    addActivity(
+      `${issuingMedic} issued ${issuedSummary} to ${recipient}${
+        operationName ? ` for ${operationName}` : ''
+      }`,
+      selectedShipId,
+      '📦',
+    )
+
+    clearForm()
   }
 
   return (
-    <section className="panel">
-      <div className="panel-header">
+    <section className="console-panel supply-issue-panel">
+      <div className="panel-command-row">
         <div>
-          <p className="eyebrow">Medical Supply</p>
-          <h3>Inventory Control</h3>
-        </div>
-
-        <div className="panel-actions">
-          {isAdminMode && (
-            <button className="admin-button" onClick={resetInventory}>
-              Reset Inventory
-            </button>
-          )}
-
-          <span className="tag">{isAdminMode ? 'Admin Mode' : 'View Mode'}</span>
+          <p className="section-kicker">Supply Issue</p>
+          <h2>Ship Supplies</h2>
         </div>
       </div>
 
-      <input
-        className="search-box"
-        placeholder="Search inventory..."
-        value={searchTerm}
-        onChange={(event) => setSearchTerm(event.target.value)}
-      />
-
-      {isAdminMode && (
-        <form className="admin-form" onSubmit={addInventoryItem}>
-          <input
-            placeholder="Item name"
-            value={newItem}
-            onChange={(event) => setNewItem(event.target.value)}
-          />
-
+      <form onSubmit={submitIssueLog}>
+        <label className="wide-label">
+          Ship
           <select
-            value={newCategory}
-            onChange={(event) => setNewCategory(event.target.value)}
+            value={selectedShipId}
+            onChange={(event) => setSelectedShipId(event.target.value)}
           >
-            <option>Medical Supply</option>
-            <option>Medication</option>
-            <option>Medical Tool</option>
-            <option>Rescue Equipment</option>
+            {ships.map((ship) => (
+              <option key={ship.id} value={ship.id}>
+                {ship.name}
+              </option>
+            ))}
           </select>
+        </label>
 
-          <input
-            type="number"
-            placeholder="Quantity"
-            value={newQuantity}
-            onChange={(event) => setNewQuantity(event.target.value)}
-          />
+        <div className="issue-details">
+          <label>
+            Issuing Medic
+            <input
+              placeholder="Medic callsign..."
+              value={issuingMedic}
+              onChange={(event) => setIssuingMedic(event.target.value)}
+            />
+          </label>
 
-          <button className="admin-button" type="submit">
-            Add Item
-          </button>
-        </form>
-      )}
+          <label>
+            Recipient
+            <input
+              placeholder="Name or callsign..."
+              value={recipient}
+              onChange={(event) => setRecipient(event.target.value)}
+            />
+          </label>
 
-      <div
-        className={
-          isAdminMode
-            ? 'table inventory-table'
-            : 'table inventory-table view-only'
-        }
-      >
-        <div className="table-row table-head">
-          <span>Item</span>
-          <span>Category</span>
-          <span>Qty</span>
-          <span>Status</span>
-          <span>Stock</span>
-          {isAdminMode && <span>Actions</span>}
+          <label className="full-width">
+            Operation Name
+            <input
+              placeholder="Operation name..."
+              value={operationName}
+              onChange={(event) => setOperationName(event.target.value)}
+            />
+          </label>
         </div>
 
-        {filteredItems.map((item) => (
-          <div className="table-row" key={item.item}>
-            <span>{item.item}</span>
-            <span>{item.category}</span>
-            <span>{item.quantity}</span>
-            <span>
-              {isAdminMode ? (
-                <select
-                  className={`status-select ${getStatusClass(item.status)}`}
-                  value={item.status}
-                  onChange={(event) =>
-                    updateStatus(item.item, event.target.value)
-                  }
-                >
-                  <option>Ready</option>
-                  <option>In Stock</option>
-                  <option>Monitor</option>
-                  <option>Reserved</option>
-                  <option>Offline</option>
-                </select>
-              ) : (
-                <span className={getStatusClass(item.status)}>
-                  {item.status}
-                </span>
-              )}
-            </span>
-            <span
-              className={`stock-pill stock-${getStockLevel(
-                item.quantity,
-              ).toLowerCase()}`}
-            >
-              {getStockLevel(item.quantity)}
-            </span>
+        <p className="section-kicker">Select Supplies To Issue</p>
 
-            {isAdminMode && (
-              <span className="control-group">
+        <div className="supply-list">
+          {supplies.map((item) => (
+            <div className="supply-row" key={item.id}>
+              <div>
+                <strong>{item.name}</strong>
+                <span>
+                  {item.description} • {item.quantity} in stock
+                </span>
+              </div>
+
+              <div className="quantity-controls">
                 <button
-                  className="small-button"
-                  onClick={() => updateQuantity(item.item, -1)}
+                  type="button"
+                  onClick={() => changeIssueQuantity(item.id, -1)}
                 >
-                  -
+                  −
                 </button>
 
+                <strong>{issueQuantities[item.id] || 0}</strong>
+
                 <button
-                  className="small-button"
-                  onClick={() => updateQuantity(item.item, 1)}
+                  type="button"
+                  onClick={() => changeIssueQuantity(item.id, 1)}
                 >
                   +
                 </button>
+              </div>
+            </div>
+          ))}
+        </div>
 
-                <button
-                  className="small-button danger"
-                  onClick={() => deleteInventoryItem(item.item)}
-                >
-                  Delete
-                </button>
+        <div className="form-actions">
+          <button type="submit">Submit Issue Log</button>
+          <button type="button" onClick={clearForm}>
+            Clear
+          </button>
+        </div>
+      </form>
+    </section>
+  )
+}
+
+function MedicRoster() {
+  return (
+    <section className="console-panel">
+      <div className="panel-command-row">
+        <div>
+          <p className="section-kicker">Personnel</p>
+          <h2>Medic Roster</h2>
+        </div>
+      </div>
+
+      <div className="supply-list">
+        {startingRoster.map((member) => (
+          <div className="supply-row" key={member.callsign}>
+            <div>
+              <strong>{member.name}</strong>
+              <span>
+                {member.callsign} • {member.role}
               </span>
-            )}
+            </div>
+
+            <em>{member.status}</em>
           </div>
         ))}
       </div>
@@ -1221,626 +1437,93 @@ function Inventory({ inventoryItems, setInventoryItems, isAdminMode }) {
   )
 }
 
-function MedicalBeds({ medicalBeds, setMedicalBeds, isAdminMode }) {
-  const medicalAreas = [
-    'Normandy / Idris Medical Bay',
-    'RSI Apollo Medivac',
-    'RSI Apollo Triage',
-  ]
-
-  const [selectedMedicalArea, setSelectedMedicalArea] = useState(
-    'Normandy / Idris Medical Bay',
-  )
-
-  const availableConfigurations = [
-    ...new Set(
-      medicalBeds
-        .filter((bed) => bed.area === selectedMedicalArea)
-        .map((bed) => bed.configuration),
-    ),
-  ]
-
-  const [selectedConfiguration, setSelectedConfiguration] = useState(
-    'Standard Idris Medical Bay',
-  )
-
-  const [draftAssignments, setDraftAssignments] = useState(() => {
-    const startingDrafts = {}
-
-    medicalBeds.forEach((bed) => {
-      const bedKey = getBedKey(bed)
-      startingDrafts[bedKey] = bed.assignedTo
-    })
-
-    return startingDrafts
-  })
-
-  const activeConfiguration =
-    availableConfigurations.includes(selectedConfiguration)
-      ? selectedConfiguration
-      : availableConfigurations[0]
-
-  const visibleBeds = medicalBeds.filter(
-    (bed) =>
-      bed.area === selectedMedicalArea &&
-      bed.configuration === activeConfiguration,
-  )
-
-  function getBedKey(bed) {
-    return `${bed.area}-${bed.configuration}-${bed.bed}`
-  }
-
-  function getAssignedList(assignedTo) {
-    if (!assignedTo || assignedTo === 'Unassigned') return []
-
-    return assignedTo
-      .split(',')
-      .map((person) => person.trim())
-      .filter(Boolean)
-  }
-
-  function changeMedicalArea(newArea) {
-    setSelectedMedicalArea(newArea)
-
-    const firstConfiguration = medicalBeds.find(
-      (bed) => bed.area === newArea,
-    )?.configuration
-
-    if (firstConfiguration) {
-      setSelectedConfiguration(firstConfiguration)
-    }
-  }
-
-  function updateDraftAssignment(bed, newAssignment) {
-    const bedKey = getBedKey(bed)
-
-    setDraftAssignments({
-      ...draftAssignments,
-      [bedKey]: newAssignment,
-    })
-  }
-
-  function saveBedAssignment(targetBed) {
-    const targetKey = getBedKey(targetBed)
-
-    const updatedBeds = medicalBeds.map((bed) => {
-      const bedKey = getBedKey(bed)
-
-      if (bedKey === targetKey) {
-        return {
-          ...bed,
-          assignedTo: draftAssignments[targetKey] || 'Unassigned',
-        }
-      }
-
-      return bed
-    })
-
-    setMedicalBeds(updatedBeds)
-  }
-
-  function updateBedStatus(targetBed, newStatus) {
-    const targetKey = getBedKey(targetBed)
-
-    const updatedBeds = medicalBeds.map((bed) => {
-      const bedKey = getBedKey(bed)
-
-      if (bedKey === targetKey) {
-        return {
-          ...bed,
-          status: newStatus,
-        }
-      }
-
-      return bed
-    })
-
-    setMedicalBeds(updatedBeds)
-  }
-
-  function resetBeds() {
-    setMedicalBeds(startingMedicalBeds)
-
-    const resetDrafts = {}
-
-    startingMedicalBeds.forEach((bed) => {
-      const bedKey = `${bed.area}-${bed.configuration}-${bed.bed}`
-      resetDrafts[bedKey] = bed.assignedTo
-    })
-
-    setDraftAssignments(resetDrafts)
-    setSelectedMedicalArea('Normandy / Idris Medical Bay')
-    setSelectedConfiguration('Standard Idris Medical Bay')
-  }
-
+function ActivityLog({ activityLog, clearLog, isAdminMode }) {
   return (
-    <section className="panel">
-      <div className="panel-header">
+    <section className="console-panel activity-panel">
+      <div className="panel-command-row">
         <div>
-          <p className="eyebrow">Shipboard Medical Areas</p>
-          <h3>Medical Bed Assignments</h3>
+          <p className="section-kicker">Recent Activity</p>
+          <h2>Activity Log</h2>
         </div>
 
         <div className="panel-actions">
+          <span>{activityLog.length} entries</span>
+
           {isAdminMode && (
-            <button className="admin-button" onClick={resetBeds}>
-              Reset Beds
+            <button className="console-button danger" onClick={clearLog}>
+              Clear Log
             </button>
           )}
-
-          <span className="tag">{isAdminMode ? 'Admin Mode' : 'View Mode'}</span>
         </div>
       </div>
 
-      <div className="medical-area-controls">
-        <div className="medical-area-selector">
-          <label className="field-label">Active Medical Area</label>
+      <div className="activity-list">
+        {activityLog.length === 0 && (
+          <p className="empty-text">No activity has been recorded yet.</p>
+        )}
 
-          <select
-            className="medical-area-dropdown"
-            value={selectedMedicalArea}
-            onChange={(event) => changeMedicalArea(event.target.value)}
-          >
-            {medicalAreas.map((area) => (
-              <option key={area}>{area}</option>
-            ))}
-          </select>
-        </div>
-
-        <div className="medical-area-selector">
-          <label className="field-label">Bed Configuration</label>
-
-          <select
-            className="medical-area-dropdown"
-            value={activeConfiguration}
-            onChange={(event) => setSelectedConfiguration(event.target.value)}
-          >
-            {availableConfigurations.map((configuration) => (
-              <option key={configuration}>{configuration}</option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      <p className="helper-text">
-        Current layout: {selectedMedicalArea} / {activeConfiguration}. Multiple
-        personnel may be assigned to the same bed by separating names with
-        commas.
-      </p>
-
-      <div className="bed-grid">
-        {visibleBeds.map((bed) => {
-          const bedKey = getBedKey(bed)
-          const assignedList = getAssignedList(bed.assignedTo)
-
-          return (
-            <div className="bed-card" key={bedKey}>
-              <span>
-                {bed.tier} • {bed.area}
-              </span>
-
-              <strong>
-                {bed.bed} — {bed.designation}
-              </strong>
-
-              {isAdminMode ? (
-                <>
-                  <label className="field-label">Assigned Personnel</label>
-
-                  <div className="assign-row">
-                    <input
-                      className="inline-input"
-                      type="text"
-                      value={draftAssignments[bedKey] || ''}
-                      placeholder="Name, callsign, name, callsign..."
-                      onChange={(event) =>
-                        updateDraftAssignment(bed, event.target.value)
-                      }
-                      onKeyDown={(event) => {
-                        if (event.key === 'Enter') {
-                          saveBedAssignment(bed)
-                        }
-                      }}
-                    />
-
-                    <button
-                      className="small-button save-button"
-                      onClick={() => saveBedAssignment(bed)}
-                    >
-                      ✓
-                    </button>
-                  </div>
-
-                  <label className="field-label">Status</label>
-
-                  <select
-                    className={`status-select ${getStatusClass(bed.status)}`}
-                    value={bed.status}
-                    onChange={(event) =>
-                      updateBedStatus(bed, event.target.value)
-                    }
-                  >
-                    <option>Available</option>
-                    <option>Standby</option>
-                    <option>Open</option>
-                    <option>Reserved</option>
-                    <option>Occupied</option>
-                  </select>
-                </>
-              ) : (
-                <>
-                  <div className="assigned-list">
-                    <label className="field-label">Assigned</label>
-
-                    {assignedList.length > 0 ? (
-                      <div className="person-chip-list">
-                        {assignedList.map((person) => (
-                          <span className="person-chip" key={person}>
-                            {person}
-                          </span>
-                        ))}
-                      </div>
-                    ) : (
-                      <p>Unassigned</p>
-                    )}
-                  </div>
-
-                  <p>
-                    Status:{' '}
-                    <span className={getStatusClass(bed.status)}>
-                      {bed.status}
-                    </span>
-                  </p>
-                </>
-              )}
-
-              <p>Purpose: {bed.purpose}</p>
-            </div>
-          )
-        })}
+        {activityLog.map((entry) => (
+          <div className="activity-row" key={entry.id}>
+            <span>{entry.icon}</span>
+            <strong>{entry.message}</strong>
+            <em>{entry.ship}</em>
+            <small>{entry.time}</small>
+          </div>
+        ))}
       </div>
     </section>
   )
 }
 
-function Operations({ operations, setOperations, isAdminMode }) {
-  const [newOperation, setNewOperation] = useState('')
-  const [newType, setNewType] = useState('Medical Overwatch')
-  const [newAsset, setNewAsset] = useState('Normandy')
-  const [newPriority, setNewPriority] = useState('Normal')
-
-  function updateOperation(index, field, value) {
-    const updatedOperations = operations.map((mission, missionIndex) => {
-      if (missionIndex === index) {
-        return {
-          ...mission,
-          [field]: value,
-        }
-      }
-
-      return mission
-    })
-
-    setOperations(updatedOperations)
-  }
-
-  function addOperation(event) {
-    event.preventDefault()
-
-    if (!newOperation.trim()) return
-
-    const addedOperation = {
-      operation: newOperation.trim(),
-      type: newType,
-      asset: newAsset,
-      status: 'Standby',
-      priority: newPriority,
-    }
-
-    setOperations([...operations, addedOperation])
-    setNewOperation('')
-    setNewType('Medical Overwatch')
-    setNewAsset('Normandy')
-    setNewPriority('Normal')
-  }
-
-  function deleteOperation(operationName) {
-    const updatedOperations = operations.filter(
-      (mission) => mission.operation !== operationName,
+function Reports({ ships, beds, supplies, activityLog }) {
+  const reportText = useMemo(() => {
+    const occupiedBeds = beds.filter(
+      (bed) => bed.status === 'Occupied' || bed.respawns.length > 0,
     )
 
-    setOperations(updatedOperations)
-  }
+    const lowSupplies = supplies.filter((item) => item.quantity <= 10)
 
-  function resetOperations() {
-    setOperations(startingOperations)
-  }
-
-  return (
-    <section className="panel">
-      <div className="panel-header">
-        <div>
-          <p className="eyebrow">Mission Board</p>
-          <h3>Operations</h3>
-        </div>
-
-        <div className="panel-actions">
-          {isAdminMode && (
-            <button className="admin-button" onClick={resetOperations}>
-              Reset Operations
-            </button>
-          )}
-
-          <span className="tag">{isAdminMode ? 'Admin Mode' : 'View Mode'}</span>
-        </div>
-      </div>
-
-      {isAdminMode && (
-        <form className="admin-form operations-form" onSubmit={addOperation}>
-          <input
-            placeholder="Operation name"
-            value={newOperation}
-            onChange={(event) => setNewOperation(event.target.value)}
-          />
-
-          <select
-            value={newType}
-            onChange={(event) => setNewType(event.target.value)}
-          >
-            <option>Medical Overwatch</option>
-            <option>Search and Rescue</option>
-            <option>QRF</option>
-            <option>Mass Casualty</option>
-            <option>Training</option>
-          </select>
-
-          <select
-            value={newAsset}
-            onChange={(event) => setNewAsset(event.target.value)}
-          >
-            <option>Normandy</option>
-            <option>RSI Apollo Medivac</option>
-            <option>RSI Apollo Triage</option>
-            <option>C8R Pisces Rescue</option>
-            <option>Ground Team</option>
-          </select>
-
-          <select
-            value={newPriority}
-            onChange={(event) => setNewPriority(event.target.value)}
-          >
-            <option>Normal</option>
-            <option>High</option>
-            <option>Critical</option>
-          </select>
-
-          <button className="admin-button" type="submit">
-            Add Operation
-          </button>
-        </form>
-      )}
-
-      <div className="table">
-        <div className="table-row table-head">
-          <span>Operation</span>
-          <span>Type</span>
-          <span>Asset</span>
-          <span>Status</span>
-        </div>
-
-        {operations.map((mission, index) => (
-          <div className="table-row" key={mission.operation}>
-            <span>{mission.operation}</span>
-            <span>{mission.type}</span>
-            <span>{mission.asset}</span>
-            <span>
-              {isAdminMode ? (
-                <div className="control-group">
-                  <select
-                    className={`status-select ${getStatusClass(
-                      mission.status,
-                    )}`}
-                    value={mission.status}
-                    onChange={(event) =>
-                      updateOperation(index, 'status', event.target.value)
-                    }
-                  >
-                    <option>Ready</option>
-                    <option>Standby</option>
-                    <option>Reserved</option>
-                    <option>Offline</option>
-                  </select>
-
-                  <select
-                    className="status-select"
-                    value={mission.priority}
-                    onChange={(event) =>
-                      updateOperation(index, 'priority', event.target.value)
-                    }
-                  >
-                    <option>Normal</option>
-                    <option>High</option>
-                    <option>Critical</option>
-                  </select>
-
-                  <button
-                    className="small-button danger"
-                    onClick={() => deleteOperation(mission.operation)}
-                  >
-                    Delete
-                  </button>
-                </div>
-              ) : (
-                <span className={getStatusClass(mission.status)}>
-                  {mission.status}
-                </span>
-              )}
-            </span>
-          </div>
-        ))}
-      </div>
-    </section>
-  )
-}
-
-function Reports({ inventoryItems, fleetShips, medicalBeds, operations }) {
-  const generatedAt = new Date().toLocaleString()
-  const lowStockItems = inventoryItems.filter((item) => item.quantity <= 30)
-  const criticalStockItems = inventoryItems.filter((item) => item.quantity <= 10)
-  const readyShips = fleetShips.filter((ship) => ship.status === 'Ready')
-  const offlineShips = fleetShips.filter((ship) => ship.status === 'Offline')
-  const pendingOperations = operations.filter(
-    (mission) => mission.status === 'Standby' || mission.status === 'Reserved',
-  )
-  const criticalOperations = operations.filter(
-    (mission) => mission.priority === 'Critical',
-  )
-
-  const reportText = `
+    return `
 PHOENIX SQUADRON MEDICAL REPORT
-Generated: ${generatedAt}
-Report Type: Operational Readiness Summary
-Prepared By: Phoenix Medical Portal
+Generated: ${new Date().toLocaleString()}
 
-==================================================
-COMMAND SUMMARY
-==================================================
-Medical Readiness: GREEN
-Active Fleet Assets Ready: ${readyShips.length}
-Pending Operations: ${pendingOperations.length}
-Critical Operations: ${criticalOperations.length}
-Offline Ships: ${offlineShips.length}
-Low Stock Items: ${lowStockItems.length}
-Critical Stock Items: ${criticalStockItems.length}
+FLEET SHIPS
+${ships.map((ship) => `- ${ship.name}: ${ship.status} / ${ship.configuration}`).join('\n')}
 
-==================================================
-LOW STOCK ITEMS
-==================================================
+BEDS OCCUPIED
+${occupiedBeds.length} / ${beds.length}
+
+LOW SUPPLIES
 ${
-  lowStockItems.length > 0
-    ? lowStockItems
-        .map(
-          (item) =>
-            `- ${item.item}: ${item.quantity} remaining (${getStockLevel(
-              item.quantity,
-            )})`,
-        )
-        .join('\n')
-    : '- No low stock items detected.'
+  lowSupplies.length > 0
+    ? lowSupplies.map((item) => `- ${item.name}: ${item.quantity}`).join('\n')
+    : '- No low supply warnings.'
 }
 
-==================================================
-FLEET STATUS
-==================================================
-${fleetShips
-  .map(
-    (ship) =>
-      `- ${ship.name}
-  Role: ${ship.role}
-  Status: ${ship.status}
-  Crew: ${ship.crew}
-  Assignment: ${ship.assignment}`,
-  )
-  .join('\n\n')}
-
-==================================================
-NORMANDY MEDICAL BED ASSIGNMENTS
-==================================================
-${medicalBeds
-  .map(
-    (bed) =>
-      `- ${bed.bed} — ${bed.designation}
-  Assigned To: ${bed.assignedTo}
-  Status: ${bed.status}
-  Purpose: ${bed.purpose}`,
-  )
-  .join('\n\n')}
-
-==================================================
-OPERATIONS BOARD
-==================================================
-${operations
-  .map(
-    (mission) =>
-      `- ${mission.operation}
-  Type: ${mission.type}
-  Asset: ${mission.asset}
-  Status: ${mission.status}
-  Priority: ${mission.priority}`,
-  )
-  .join('\n\n')}
-
-==================================================
-END OF REPORT
-==================================================
+RECENT ACTIVITY
+${activityLog
+  .slice(0, 10)
+  .map((entry) => `- ${entry.time}: ${entry.message}`)
+  .join('\n')}
 `.trim()
+  }, [ships, beds, supplies, activityLog])
 
   function copyReport() {
     navigator.clipboard.writeText(reportText)
-    window.alert('Phoenix Medical report copied to clipboard')
-  }
-
-  function printReport() {
-    window.print()
+    window.alert('Report copied to clipboard.')
   }
 
   return (
-    <section className="panel report-panel">
-      <div className="panel-header">
+    <section className="console-panel">
+      <div className="panel-command-row">
         <div>
-          <p className="eyebrow">Command Summary</p>
-          <h3>Export Report</h3>
+          <p className="section-kicker">Reports</p>
+          <h2>Command Report</h2>
         </div>
 
-        <div className="panel-actions">
-          <button className="admin-button" onClick={copyReport}>
-            Copy Report
-          </button>
-
-          <button className="admin-button" onClick={printReport}>
-            Print / Save PDF
-          </button>
-        </div>
-      </div>
-
-      <div className="report-summary">
-        <div className="summary-item">
-          <span>Generated</span>
-          <strong>{generatedAt}</strong>
-          <p>Current browser time at report creation.</p>
-        </div>
-
-        <div className="summary-item">
-          <span>Fleet Ready</span>
-          <strong>{readyShips.length}</strong>
-          <p>
-            {readyShips.length > 0
-              ? readyShips.map((ship) => ship.name).join(', ')
-              : 'No ready fleet assets.'}
-          </p>
-        </div>
-
-        <div className="summary-item">
-          <span>Low Stock</span>
-          <strong>{lowStockItems.length}</strong>
-          <p>
-            {lowStockItems.length > 0
-              ? lowStockItems.map((item) => item.item).join(', ')
-              : 'No low-stock items.'}
-          </p>
-        </div>
-
-        <div className="summary-item">
-          <span>Critical Ops</span>
-          <strong>{criticalOperations.length}</strong>
-          <p>
-            {criticalOperations.length > 0
-              ? criticalOperations
-                  .map((mission) => mission.operation)
-                  .join(', ')
-              : 'No critical operations.'}
-          </p>
-        </div>
+        <button className="console-button" onClick={copyReport}>
+          Copy Report
+        </button>
       </div>
 
       <pre className="report-box">{reportText}</pre>
