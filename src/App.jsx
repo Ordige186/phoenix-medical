@@ -78,49 +78,302 @@ const startingInventoryItems = [
 
 const startingMedicalBeds = [
   {
-    bed: 'Bed 01',
-    designation: 'Trauma Alpha',
-    assignedTo: 'Phoenix Actual',
-    status: 'Available',
-    purpose: 'Command imprint / emergency trauma',
-  },
-  {
-    bed: 'Bed 02',
-    designation: 'Trauma Bravo',
-    assignedTo: 'Chief Corpsman',
-    status: 'Available',
-    purpose: 'Senior medical staff imprint',
-  },
-  {
-    bed: 'Bed 03',
-    designation: 'Recovery Alpha',
-    assignedTo: 'Phoenix Med-1',
-    status: 'Standby',
-    purpose: 'Post-treatment recovery',
-  },
-  {
-    bed: 'Bed 04',
-    designation: 'Recovery Bravo',
-    assignedTo: 'Phoenix Med-2',
-    status: 'Standby',
-    purpose: 'Secondary recovery / overflow',
-  },
-  {
-    bed: 'Bed 05',
-    designation: 'Casualty Overflow',
+    area: 'Normandy / Idris Medical Bay',
+    configuration: 'Standard Idris Medical Bay',
+    tier: 'T3',
+    bed: 'T3 Bed 01',
+    designation: 'Trauma Bed Alpha',
     assignedTo: 'Unassigned',
-    status: 'Open',
-    purpose: 'Guest casualty / rescued personnel',
+    status: 'Available',
+    purpose: 'Primary casualty stabilization',
   },
   {
-    bed: 'Bed 06',
-    designation: 'Emergency Reserve',
+    area: 'Normandy / Idris Medical Bay',
+    configuration: 'Standard Idris Medical Bay',
+    tier: 'T3',
+    bed: 'T3 Bed 02',
+    designation: 'Trauma Bed Bravo',
+    assignedTo: 'Unassigned',
+    status: 'Available',
+    purpose: 'Primary casualty stabilization',
+  },
+  {
+    area: 'Normandy / Idris Medical Bay',
+    configuration: 'Standard Idris Medical Bay',
+    tier: 'T3',
+    bed: 'T3 Bed 03',
+    designation: 'Trauma Bed Charlie',
+    assignedTo: 'Unassigned',
+    status: 'Available',
+    purpose: 'Overflow casualty treatment',
+  },
+  {
+    area: 'Normandy / Idris Medical Bay',
+    configuration: 'Standard Idris Medical Bay',
+    tier: 'T3',
+    bed: 'T3 Bed 04',
+    designation: 'Trauma Bed Delta',
+    assignedTo: 'Unassigned',
+    status: 'Available',
+    purpose: 'Overflow casualty treatment',
+  },
+  {
+    area: 'Normandy / Idris Medical Bay',
+    configuration: 'Operations Room',
+    tier: 'T2',
+    bed: 'T2 Bed 01',
+    designation: 'Operations Room Medical Bed',
     assignedTo: 'Unassigned',
     status: 'Reserved',
-    purpose: 'Critical MASCAS use only',
+    purpose: 'Operations room casualty care / priority patient',
+  },
+
+  {
+    area: 'RSI Apollo Medivac',
+    configuration: 'T3 Module',
+    tier: 'T3',
+    bed: 'Left T3 Bed 01',
+    designation: 'Left Side Treatment Bed',
+    assignedTo: 'Unassigned',
+    status: 'Available',
+    purpose: 'Basic treatment / casualty holding',
+  },
+  {
+    area: 'RSI Apollo Medivac',
+    configuration: 'T3 Module',
+    tier: 'T3',
+    bed: 'Left T3 Bed 02',
+    designation: 'Left Side Treatment Bed',
+    assignedTo: 'Unassigned',
+    status: 'Available',
+    purpose: 'Basic treatment / casualty holding',
+  },
+  {
+    area: 'RSI Apollo Medivac',
+    configuration: 'T3 Module',
+    tier: 'T3',
+    bed: 'Left T3 Bed 03',
+    designation: 'Left Side Treatment Bed',
+    assignedTo: 'Unassigned',
+    status: 'Available',
+    purpose: 'Basic treatment / casualty holding',
+  },
+  {
+    area: 'RSI Apollo Medivac',
+    configuration: 'T3 Module',
+    tier: 'T3',
+    bed: 'Right T3 Bed 01',
+    designation: 'Right Side Treatment Bed',
+    assignedTo: 'Unassigned',
+    status: 'Available',
+    purpose: 'Basic treatment / casualty holding',
+  },
+  {
+    area: 'RSI Apollo Medivac',
+    configuration: 'T3 Module',
+    tier: 'T3',
+    bed: 'Right T3 Bed 02',
+    designation: 'Right Side Treatment Bed',
+    assignedTo: 'Unassigned',
+    status: 'Available',
+    purpose: 'Basic treatment / casualty holding',
+  },
+  {
+    area: 'RSI Apollo Medivac',
+    configuration: 'T3 Module',
+    tier: 'T3',
+    bed: 'Right T3 Bed 03',
+    designation: 'Right Side Treatment Bed',
+    assignedTo: 'Unassigned',
+    status: 'Available',
+    purpose: 'Basic treatment / casualty holding',
+  },
+
+  {
+    area: 'RSI Apollo Medivac',
+    configuration: 'T2 Module',
+    tier: 'T2',
+    bed: 'Left T2 Bed 01',
+    designation: 'Left Side Advanced Bed',
+    assignedTo: 'Unassigned',
+    status: 'Available',
+    purpose: 'Advanced treatment / stabilized casualty',
+  },
+  {
+    area: 'RSI Apollo Medivac',
+    configuration: 'T2 Module',
+    tier: 'T2',
+    bed: 'Left T2 Bed 02',
+    designation: 'Left Side Advanced Bed',
+    assignedTo: 'Unassigned',
+    status: 'Available',
+    purpose: 'Advanced treatment / stabilized casualty',
+  },
+  {
+    area: 'RSI Apollo Medivac',
+    configuration: 'T2 Module',
+    tier: 'T2',
+    bed: 'Right T2 Bed 01',
+    designation: 'Right Side Advanced Bed',
+    assignedTo: 'Unassigned',
+    status: 'Available',
+    purpose: 'Advanced treatment / stabilized casualty',
+  },
+  {
+    area: 'RSI Apollo Medivac',
+    configuration: 'T2 Module',
+    tier: 'T2',
+    bed: 'Right T2 Bed 02',
+    designation: 'Right Side Advanced Bed',
+    assignedTo: 'Unassigned',
+    status: 'Available',
+    purpose: 'Advanced treatment / stabilized casualty',
+  },
+
+  {
+    area: 'RSI Apollo Medivac',
+    configuration: 'T1 Module',
+    tier: 'T1',
+    bed: 'Left T1 Bed 01',
+    designation: 'Left Side Critical Bed',
+    assignedTo: 'Unassigned',
+    status: 'Reserved',
+    purpose: 'Critical casualty treatment',
+  },
+  {
+    area: 'RSI Apollo Medivac',
+    configuration: 'T1 Module',
+    tier: 'T1',
+    bed: 'Right T1 Bed 01',
+    designation: 'Right Side Critical Bed',
+    assignedTo: 'Unassigned',
+    status: 'Reserved',
+    purpose: 'Critical casualty treatment',
+  },
+
+  {
+    area: 'RSI Apollo Triage',
+    configuration: 'T3 Module',
+    tier: 'T3',
+    bed: 'Left T3 Bed 01',
+    designation: 'Left Side Triage Bed',
+    assignedTo: 'Unassigned',
+    status: 'Available',
+    purpose: 'Triage / casualty sorting',
+  },
+  {
+    area: 'RSI Apollo Triage',
+    configuration: 'T3 Module',
+    tier: 'T3',
+    bed: 'Left T3 Bed 02',
+    designation: 'Left Side Triage Bed',
+    assignedTo: 'Unassigned',
+    status: 'Available',
+    purpose: 'Triage / casualty sorting',
+  },
+  {
+    area: 'RSI Apollo Triage',
+    configuration: 'T3 Module',
+    tier: 'T3',
+    bed: 'Left T3 Bed 03',
+    designation: 'Left Side Triage Bed',
+    assignedTo: 'Unassigned',
+    status: 'Available',
+    purpose: 'Triage / casualty sorting',
+  },
+  {
+    area: 'RSI Apollo Triage',
+    configuration: 'T3 Module',
+    tier: 'T3',
+    bed: 'Right T3 Bed 01',
+    designation: 'Right Side Triage Bed',
+    assignedTo: 'Unassigned',
+    status: 'Available',
+    purpose: 'Triage / casualty sorting',
+  },
+  {
+    area: 'RSI Apollo Triage',
+    configuration: 'T3 Module',
+    tier: 'T3',
+    bed: 'Right T3 Bed 02',
+    designation: 'Right Side Triage Bed',
+    assignedTo: 'Unassigned',
+    status: 'Available',
+    purpose: 'Triage / casualty sorting',
+  },
+  {
+    area: 'RSI Apollo Triage',
+    configuration: 'T3 Module',
+    tier: 'T3',
+    bed: 'Right T3 Bed 03',
+    designation: 'Right Side Triage Bed',
+    assignedTo: 'Unassigned',
+    status: 'Available',
+    purpose: 'Triage / casualty sorting',
+  },
+
+  {
+    area: 'RSI Apollo Triage',
+    configuration: 'T2 Module',
+    tier: 'T2',
+    bed: 'Left T2 Bed 01',
+    designation: 'Left Side Advanced Triage Bed',
+    assignedTo: 'Unassigned',
+    status: 'Available',
+    purpose: 'Advanced triage / monitored treatment',
+  },
+  {
+    area: 'RSI Apollo Triage',
+    configuration: 'T2 Module',
+    tier: 'T2',
+    bed: 'Left T2 Bed 02',
+    designation: 'Left Side Advanced Triage Bed',
+    assignedTo: 'Unassigned',
+    status: 'Available',
+    purpose: 'Advanced triage / monitored treatment',
+  },
+  {
+    area: 'RSI Apollo Triage',
+    configuration: 'T2 Module',
+    tier: 'T2',
+    bed: 'Right T2 Bed 01',
+    designation: 'Right Side Advanced Triage Bed',
+    assignedTo: 'Unassigned',
+    status: 'Available',
+    purpose: 'Advanced triage / monitored treatment',
+  },
+  {
+    area: 'RSI Apollo Triage',
+    configuration: 'T2 Module',
+    tier: 'T2',
+    bed: 'Right T2 Bed 02',
+    designation: 'Right Side Advanced Triage Bed',
+    assignedTo: 'Unassigned',
+    status: 'Available',
+    purpose: 'Advanced triage / monitored treatment',
+  },
+
+  {
+    area: 'RSI Apollo Triage',
+    configuration: 'T1 Module',
+    tier: 'T1',
+    bed: 'Left T1 Bed 01',
+    designation: 'Left Side Critical Triage Bed',
+    assignedTo: 'Unassigned',
+    status: 'Reserved',
+    purpose: 'Critical casualty triage',
+  },
+  {
+    area: 'RSI Apollo Triage',
+    configuration: 'T1 Module',
+    tier: 'T1',
+    bed: 'Right T1 Bed 01',
+    designation: 'Right Side Critical Triage Bed',
+    assignedTo: 'Unassigned',
+    status: 'Reserved',
+    purpose: 'Critical casualty triage',
   },
 ]
-
 const startingFleetShips = [
   {
     name: 'RSI Apollo Medivac',
@@ -912,29 +1165,94 @@ function Inventory({ inventoryItems, setInventoryItems, isAdminMode }) {
 }
 
 function MedicalBeds({ medicalBeds, setMedicalBeds, isAdminMode }) {
+  const medicalAreas = [
+    'Normandy / Idris Medical Bay',
+    'RSI Apollo Medivac',
+    'RSI Apollo Triage',
+  ]
+
+  const [selectedMedicalArea, setSelectedMedicalArea] = useState(
+    'Normandy / Idris Medical Bay',
+  )
+
+  const availableConfigurations = [
+    ...new Set(
+      medicalBeds
+        .filter((bed) => bed.area === selectedMedicalArea)
+        .map((bed) => bed.configuration),
+    ),
+  ]
+
+  const [selectedConfiguration, setSelectedConfiguration] = useState(
+    'Standard Idris Medical Bay',
+  )
+
   const [draftAssignments, setDraftAssignments] = useState(() => {
     const startingDrafts = {}
 
     medicalBeds.forEach((bed) => {
-      startingDrafts[bed.bed] = bed.assignedTo
+      const bedKey = getBedKey(bed)
+      startingDrafts[bedKey] = bed.assignedTo
     })
 
     return startingDrafts
   })
 
-  function updateDraftAssignment(bedName, newAssignment) {
+  const activeConfiguration =
+    availableConfigurations.includes(selectedConfiguration)
+      ? selectedConfiguration
+      : availableConfigurations[0]
+
+  const visibleBeds = medicalBeds.filter(
+    (bed) =>
+      bed.area === selectedMedicalArea &&
+      bed.configuration === activeConfiguration,
+  )
+
+  function getBedKey(bed) {
+    return `${bed.area}-${bed.configuration}-${bed.bed}`
+  }
+
+  function getAssignedList(assignedTo) {
+    if (!assignedTo || assignedTo === 'Unassigned') return []
+
+    return assignedTo
+      .split(',')
+      .map((person) => person.trim())
+      .filter(Boolean)
+  }
+
+  function changeMedicalArea(newArea) {
+    setSelectedMedicalArea(newArea)
+
+    const firstConfiguration = medicalBeds.find(
+      (bed) => bed.area === newArea,
+    )?.configuration
+
+    if (firstConfiguration) {
+      setSelectedConfiguration(firstConfiguration)
+    }
+  }
+
+  function updateDraftAssignment(bed, newAssignment) {
+    const bedKey = getBedKey(bed)
+
     setDraftAssignments({
       ...draftAssignments,
-      [bedName]: newAssignment,
+      [bedKey]: newAssignment,
     })
   }
 
-  function saveBedAssignment(bedName) {
+  function saveBedAssignment(targetBed) {
+    const targetKey = getBedKey(targetBed)
+
     const updatedBeds = medicalBeds.map((bed) => {
-      if (bed.bed === bedName) {
+      const bedKey = getBedKey(bed)
+
+      if (bedKey === targetKey) {
         return {
           ...bed,
-          assignedTo: draftAssignments[bedName] || 'Unassigned',
+          assignedTo: draftAssignments[targetKey] || 'Unassigned',
         }
       }
 
@@ -944,9 +1262,13 @@ function MedicalBeds({ medicalBeds, setMedicalBeds, isAdminMode }) {
     setMedicalBeds(updatedBeds)
   }
 
-  function updateBedStatus(bedName, newStatus) {
+  function updateBedStatus(targetBed, newStatus) {
+    const targetKey = getBedKey(targetBed)
+
     const updatedBeds = medicalBeds.map((bed) => {
-      if (bed.bed === bedName) {
+      const bedKey = getBedKey(bed)
+
+      if (bedKey === targetKey) {
         return {
           ...bed,
           status: newStatus,
@@ -965,18 +1287,21 @@ function MedicalBeds({ medicalBeds, setMedicalBeds, isAdminMode }) {
     const resetDrafts = {}
 
     startingMedicalBeds.forEach((bed) => {
-      resetDrafts[bed.bed] = bed.assignedTo
+      const bedKey = `${bed.area}-${bed.configuration}-${bed.bed}`
+      resetDrafts[bedKey] = bed.assignedTo
     })
 
     setDraftAssignments(resetDrafts)
+    setSelectedMedicalArea('Normandy / Idris Medical Bay')
+    setSelectedConfiguration('Standard Idris Medical Bay')
   }
 
   return (
     <section className="panel">
       <div className="panel-header">
         <div>
-          <p className="eyebrow">Normandy Medical Bay</p>
-          <h3>Assigned Medical Beds</h3>
+          <p className="eyebrow">Shipboard Medical Areas</p>
+          <h3>Medical Bed Assignments</h3>
         </div>
 
         <div className="panel-actions">
@@ -990,71 +1315,132 @@ function MedicalBeds({ medicalBeds, setMedicalBeds, isAdminMode }) {
         </div>
       </div>
 
+      <div className="medical-area-controls">
+        <div className="medical-area-selector">
+          <label className="field-label">Active Medical Area</label>
+
+          <select
+            className="medical-area-dropdown"
+            value={selectedMedicalArea}
+            onChange={(event) => changeMedicalArea(event.target.value)}
+          >
+            {medicalAreas.map((area) => (
+              <option key={area}>{area}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="medical-area-selector">
+          <label className="field-label">Bed Configuration</label>
+
+          <select
+            className="medical-area-dropdown"
+            value={activeConfiguration}
+            onChange={(event) => setSelectedConfiguration(event.target.value)}
+          >
+            {availableConfigurations.map((configuration) => (
+              <option key={configuration}>{configuration}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <p className="helper-text">
+        Current layout: {selectedMedicalArea} / {activeConfiguration}. Multiple
+        personnel may be assigned to the same bed by separating names with
+        commas.
+      </p>
+
       <div className="bed-grid">
-        {medicalBeds.map((bed) => (
-          <div className="bed-card" key={bed.bed}>
-            <span>{bed.bed}</span>
-            <strong>{bed.designation}</strong>
+        {visibleBeds.map((bed) => {
+          const bedKey = getBedKey(bed)
+          const assignedList = getAssignedList(bed.assignedTo)
 
-            {isAdminMode ? (
-              <>
-                <label className="field-label">Assigned To</label>
+          return (
+            <div className="bed-card" key={bedKey}>
+              <span>
+                {bed.tier} • {bed.area}
+              </span>
 
-                <div className="assign-row">
-                  <input
-                    className="inline-input"
-                    type="text"
-                    value={draftAssignments[bed.bed] || ''}
-                    placeholder="Type name / callsign"
-                    onChange={(event) =>
-                      updateDraftAssignment(bed.bed, event.target.value)
-                    }
-                    onKeyDown={(event) => {
-                      if (event.key === 'Enter') {
-                        saveBedAssignment(bed.bed)
+              <strong>
+                {bed.bed} — {bed.designation}
+              </strong>
+
+              {isAdminMode ? (
+                <>
+                  <label className="field-label">Assigned Personnel</label>
+
+                  <div className="assign-row">
+                    <input
+                      className="inline-input"
+                      type="text"
+                      value={draftAssignments[bedKey] || ''}
+                      placeholder="Name, callsign, name, callsign..."
+                      onChange={(event) =>
+                        updateDraftAssignment(bed, event.target.value)
                       }
-                    }}
-                  />
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter') {
+                          saveBedAssignment(bed)
+                        }
+                      }}
+                    />
 
-                  <button
-                    className="small-button save-button"
-                    onClick={() => saveBedAssignment(bed.bed)}
+                    <button
+                      className="small-button save-button"
+                      onClick={() => saveBedAssignment(bed)}
+                    >
+                      ✓
+                    </button>
+                  </div>
+
+                  <label className="field-label">Status</label>
+
+                  <select
+                    className={`status-select ${getStatusClass(bed.status)}`}
+                    value={bed.status}
+                    onChange={(event) =>
+                      updateBedStatus(bed, event.target.value)
+                    }
                   >
-                    ✓
-                  </button>
-                </div>
+                    <option>Available</option>
+                    <option>Standby</option>
+                    <option>Open</option>
+                    <option>Reserved</option>
+                    <option>Occupied</option>
+                  </select>
+                </>
+              ) : (
+                <>
+                  <div className="assigned-list">
+                    <label className="field-label">Assigned</label>
 
-                <label className="field-label">Status</label>
+                    {assignedList.length > 0 ? (
+                      <div className="person-chip-list">
+                        {assignedList.map((person) => (
+                          <span className="person-chip" key={person}>
+                            {person}
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <p>Unassigned</p>
+                    )}
+                  </div>
 
-                <select
-                  className={`status-select ${getStatusClass(bed.status)}`}
-                  value={bed.status}
-                  onChange={(event) =>
-                    updateBedStatus(bed.bed, event.target.value)
-                  }
-                >
-                  <option>Available</option>
-                  <option>Standby</option>
-                  <option>Open</option>
-                  <option>Reserved</option>
-                  <option>Occupied</option>
-                </select>
-              </>
-            ) : (
-              <>
-                <p>Assigned: {bed.assignedTo}</p>
-                <p>
-                  Status:{' '}
-                  <span className={getStatusClass(bed.status)}>
-                    {bed.status}
-                  </span>
-                </p>
-              </>
-            )}
+                  <p>
+                    Status:{' '}
+                    <span className={getStatusClass(bed.status)}>
+                      {bed.status}
+                    </span>
+                  </p>
+                </>
+              )}
 
-            <p>Purpose: {bed.purpose}</p>
-          </div>
-        ))}
+              <p>Purpose: {bed.purpose}</p>
+            </div>
+          )
+        })}
       </div>
     </section>
   )

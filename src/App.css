@@ -1117,3 +1117,73 @@ body {
     flex-direction: column;
   }
 }
+/* ================================
+   Medical Area / Multi-Assignment
+   ================================ */
+
+.medical-area-selector {
+  display: grid;
+  gap: 8px;
+  max-width: 360px;
+  margin-bottom: 18px;
+}
+
+.medical-area-dropdown {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid rgba(185, 28, 28, 0.35);
+  border-radius: 12px;
+  background: rgba(7, 11, 16, 0.75);
+  color: #e8edf2;
+  font-size: 13px;
+  outline: none;
+}
+
+.medical-area-dropdown:focus {
+  border-color: rgba(239, 68, 68, 0.75);
+  box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.14);
+}
+
+.helper-text {
+  margin-top: -4px;
+  color: #7f8b98;
+  font-size: 11px;
+}
+
+.assigned-list {
+  display: grid;
+  gap: 8px;
+}
+
+.person-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.person-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+  padding: 5px 9px;
+  border: 1px solid rgba(143, 199, 255, 0.28);
+  border-radius: 999px;
+  background: rgba(143, 199, 255, 0.08);
+  color: #dce5ee;
+  font-size: 11px;
+  line-height: 1;
+}
+.medical-area-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 360px));
+  gap: 16px;
+  align-items: end;
+  margin-bottom: 10px;
+}
+
+@media (max-width: 900px) {
+  .medical-area-controls {
+    grid-template-columns: 1fr;
+  }
+}
