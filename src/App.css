@@ -821,3 +821,147 @@ nav {
 .system-bar {
   border-top-color: rgba(185, 28, 28, 0.35);
 }
+/* ================================
+   Phoenix Typography Cleanup
+   ================================ */
+
+body {
+  font-size: 14px;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+}
+
+.brand h1 {
+  font-size: 18px;
+  letter-spacing: 2px;
+}
+
+.brand p {
+  font-size: 12px;
+}
+
+.hero h2 {
+  font-size: 34px;
+  line-height: 1.05;
+  letter-spacing: -0.5px;
+}
+
+.hero p:last-child {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 1.8px;
+}
+
+.nav-item {
+  font-size: 14px;
+}
+
+.card p,
+.summary-item p,
+.bed-card p,
+.table-row,
+.search-box,
+.inline-input,
+.admin-form input,
+.admin-form select,
+.status-select {
+  font-size: 13px;
+}
+
+.card h3 {
+  font-size: 28px;
+}
+
+.panel-header h3 {
+  font-size: 22px;
+}
+
+.bed-card strong {
+  font-size: 16px;
+  line-height: 1.25;
+}
+
+.bed-card span {
+  font-size: 12px;
+}
+
+.table-head {
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+
+.status-pill,
+.stock-pill,
+.tag {
+  font-size: 11px;
+}
+
+.field-label {
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+
+.admin-button,
+.small-button,
+.mode-button {
+  font-size: 12px;
+}
+
+.report-box {
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.system-bar {
+  font-size: 11px;
+}
+
+/* Prevent huge logo/header from making text feel uneven */
+.hero-logo {
+  width: 140px;
+  height: 140px;
+}
+
+.logo-image {
+  width: 52px;
+  height: 52px;
+}
+
+/* Better spacing consistency */
+.panel,
+.hero {
+  padding: 26px;
+}
+
+.card {
+  padding: 18px;
+}
+
+.bed-card {
+  padding: 16px;
+}
+
+.main {
+  padding: 28px;
+  padding-bottom: 70px;
+}
+
+/* Mobile text cleanup */
+@media (max-width: 900px) {
+  .hero h2 {
+    font-size: 28px;
+  }
+
+  .panel-header h3 {
+    font-size: 20px;
+  }
+
+  .main {
+    padding: 20px;
+    padding-bottom: 90px;
+  }
+}
