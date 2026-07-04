@@ -2451,3 +2451,426 @@ body {
     grid-template-columns: 1fr;
   }
 }
+/* ================================
+   Tools Page — MEDEVAC 9-Line
+   ================================ */
+
+.tools-layout {
+  display: grid;
+  grid-template-columns: minmax(420px, 1.15fr) minmax(340px, 0.85fr);
+  gap: 18px;
+  padding: 20px;
+}
+
+.tool-card,
+.tool-preview {
+  border: 1px solid rgba(125, 211, 252, 0.16);
+  border-radius: 10px;
+  background:
+    linear-gradient(180deg, rgba(8, 15, 25, 0.94), rgba(3, 7, 12, 0.94));
+  overflow: hidden;
+}
+
+.tool-card-header {
+  min-height: 64px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(125, 211, 252, 0.14);
+  background: rgba(239, 68, 68, 0.06);
+}
+
+.tool-card-header h3 {
+  margin: 2px 0 0;
+  color: #dbeafe;
+  font-size: 18px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.tool-card-header span {
+  padding: 5px 8px;
+  border: 1px solid rgba(24, 214, 163, 0.32);
+  border-radius: 999px;
+  color: #8ef5d4;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.medevac-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  padding: 16px;
+}
+
+.medevac-grid label {
+  display: grid;
+  gap: 7px;
+  color: #7ea3bf;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.medevac-grid input,
+.medevac-grid textarea {
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid rgba(125, 211, 252, 0.18);
+  border-radius: 7px;
+  background: rgba(2, 8, 14, 0.9);
+  color: #dbeafe;
+  font-family: inherit;
+  font-size: 14px;
+  padding: 9px 10px;
+  outline: none;
+}
+
+.medevac-grid textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+.medevac-grid input:focus,
+.medevac-grid textarea:focus {
+  border-color: rgba(239, 68, 68, 0.55);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.tool-actions {
+  display: flex;
+  gap: 10px;
+  padding: 0 16px 16px;
+}
+
+.tool-actions button {
+  min-height: 42px;
+  padding: 0 16px;
+  border: 1px solid rgba(239, 68, 68, 0.34);
+  border-radius: 7px;
+  background: rgba(239, 68, 68, 0.08);
+  color: #fecaca;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.tool-actions button:hover {
+  background: rgba(239, 68, 68, 0.15);
+}
+
+.tool-preview pre {
+  min-height: 470px;
+  margin: 0;
+  padding: 18px;
+  color: #dbeafe;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+@media (max-width: 1200px) {
+  .tools-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 800px) {
+  .medevac-grid {
+    grid-template-columns: 1fr;
+  }
+}
+/* =========================================================
+   MEDEVAC 9-Liner Hard Layout Repair
+   Forces the form to match the reference-style console view
+   ========================================================= */
+
+.medevac-console-panel {
+  width: 100% !important;
+  max-width: none !important;
+  min-height: calc(100vh - 90px) !important;
+  padding: 0 !important;
+  border: 1px solid rgba(239, 68, 68, 0.24) !important;
+  border-radius: 8px !important;
+  background:
+    linear-gradient(180deg, rgba(8, 13, 22, 0.96), rgba(2, 6, 11, 0.98)) !important;
+  overflow: hidden !important;
+}
+
+.medevac-console-header {
+  min-height: 62px !important;
+  display: flex !important;
+  align-items: center !important;
+  padding: 0 22px !important;
+  border-bottom: 1px solid rgba(125, 211, 252, 0.18) !important;
+  background: rgba(3, 8, 15, 0.72) !important;
+}
+
+.medevac-title-block {
+  display: flex !important;
+  align-items: baseline !important;
+  gap: 12px !important;
+}
+
+.medevac-title-block h2 {
+  margin: 0 !important;
+  color: #dbeafe !important;
+  font-size: 22px !important;
+  line-height: 1 !important;
+  letter-spacing: 3px !important;
+  text-transform: uppercase !important;
+}
+
+.medevac-title-block span {
+  color: #7ea3bf !important;
+  font-size: 10px !important;
+  letter-spacing: 2px !important;
+  text-transform: uppercase !important;
+}
+
+/* Main form card */
+.medevac-form-panel {
+  width: min(860px, calc(100% - 40px)) !important;
+  margin: 20px !important;
+  border: 1px solid rgba(125, 211, 252, 0.2) !important;
+  border-radius: 10px !important;
+  background:
+    linear-gradient(180deg, rgba(10, 18, 30, 0.96), rgba(4, 9, 16, 0.96)) !important;
+  overflow: hidden !important;
+}
+
+/* Each numbered line */
+.medevac-line-row {
+  display: grid !important;
+  grid-template-columns: 44px 230px minmax(0, 1fr) !important;
+  gap: 14px !important;
+  align-items: center !important;
+  padding: 13px 16px !important;
+  border-bottom: 1px solid rgba(125, 211, 252, 0.12) !important;
+}
+
+.medevac-line-number {
+  color: #38bdf8 !important;
+  font-size: 30px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  text-align: center !important;
+}
+
+.medevac-line-label {
+  display: grid !important;
+  gap: 3px !important;
+}
+
+.medevac-line-label strong {
+  display: block !important;
+  color: #dbeafe !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  letter-spacing: 2px !important;
+  text-transform: uppercase !important;
+}
+
+.medevac-line-label small {
+  display: block !important;
+  color: #6f91aa !important;
+  font-size: 10px !important;
+  letter-spacing: 1px !important;
+}
+
+/* Inputs */
+.medevac-line-field {
+  min-width: 0 !important;
+}
+
+.medevac-line-field input,
+.medevac-line-field textarea,
+.medevac-bottom-row input,
+.medevac-bottom-row select {
+  width: 100% !important;
+  min-height: 40px !important;
+  box-sizing: border-box !important;
+  border: 1px solid rgba(125, 211, 252, 0.25) !important;
+  border-radius: 7px !important;
+  background: rgba(12, 21, 34, 0.98) !important;
+  color: #dbeafe !important;
+  font-family: 'Rajdhani', sans-serif !important;
+  font-size: 14px !important;
+  padding: 9px 12px !important;
+  outline: none !important;
+}
+
+.medevac-line-field textarea {
+  min-height: 70px !important;
+  resize: vertical !important;
+}
+
+.medevac-line-field input::placeholder,
+.medevac-line-field textarea::placeholder,
+.medevac-bottom-row input::placeholder {
+  color: #6f8499 !important;
+}
+
+.medevac-line-field input:focus,
+.medevac-line-field textarea:focus,
+.medevac-bottom-row input:focus,
+.medevac-bottom-row select:focus {
+  border-color: rgba(239, 68, 68, 0.65) !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+/* Callsign / ship / priority row */
+.medevac-bottom-row {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr 1.2fr !important;
+  gap: 14px !important;
+  padding: 16px !important;
+  border-bottom: 1px solid rgba(125, 211, 252, 0.12) !important;
+}
+
+.medevac-bottom-row label,
+.priority-group {
+  display: grid !important;
+  gap: 7px !important;
+}
+
+.medevac-bottom-row span,
+.priority-group > span {
+  color: #dbeafe !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  letter-spacing: 2px !important;
+  text-transform: uppercase !important;
+}
+
+.priority-buttons {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 8px !important;
+}
+
+.priority-button {
+  min-height: 40px !important;
+  border: 1px solid rgba(125, 211, 252, 0.22) !important;
+  border-radius: 7px !important;
+  background: rgba(12, 21, 34, 0.98) !important;
+  color: #9fb5c7 !important;
+  font-family: 'Rajdhani', sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  cursor: pointer !important;
+}
+
+.priority-button.active {
+  border-color: rgba(239, 68, 68, 0.65) !important;
+  background: rgba(239, 68, 68, 0.18) !important;
+  color: #fecaca !important;
+}
+
+/* Action buttons */
+.medevac-actions {
+  display: flex !important;
+  gap: 10px !important;
+  padding: 14px 16px 16px !important;
+}
+
+.medevac-primary-action,
+.medevac-secondary-action {
+  min-height: 44px !important;
+  border-radius: 7px !important;
+  font-family: 'Rajdhani', sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  letter-spacing: 2px !important;
+  text-transform: uppercase !important;
+  cursor: pointer !important;
+}
+
+.medevac-primary-action {
+  width: 320px !important;
+  border: 1px solid rgba(239, 68, 68, 0.55) !important;
+  background: rgba(239, 68, 68, 0.14) !important;
+  color: #fecaca !important;
+}
+
+.medevac-secondary-action {
+  width: 110px !important;
+  border: 1px solid rgba(125, 211, 252, 0.25) !important;
+  background: rgba(12, 21, 34, 0.98) !important;
+  color: #dbeafe !important;
+}
+
+/* Preview card */
+.medevac-preview-box {
+  width: min(860px, calc(100% - 40px)) !important;
+  margin: 16px 20px 22px !important;
+  border: 1px solid rgba(125, 211, 252, 0.18) !important;
+  border-radius: 10px !important;
+  background: rgba(4, 10, 18, 0.78) !important;
+  overflow: hidden !important;
+}
+
+.medevac-preview-header {
+  padding: 12px 16px !important;
+  border-bottom: 1px solid rgba(125, 211, 252, 0.12) !important;
+  color: #7dd3fc !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  letter-spacing: 2px !important;
+  text-transform: uppercase !important;
+}
+
+.medevac-preview-box pre {
+  margin: 0 !important;
+  padding: 16px !important;
+  color: #dbeafe !important;
+  font-family: 'Rajdhani', sans-serif !important;
+  font-size: 14px !important;
+  line-height: 1.45 !important;
+  white-space: pre-wrap !important;
+}
+
+/* Kill old Tools layout if it is still fighting this page */
+.tools-layout,
+.tool-card,
+.tool-preview,
+.medevac-grid,
+.tool-actions {
+  all: unset;
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+  .medevac-form-panel,
+  .medevac-preview-box {
+    width: calc(100% - 28px) !important;
+    margin-left: 14px !important;
+    margin-right: 14px !important;
+  }
+
+  .medevac-line-row {
+    grid-template-columns: 38px 1fr !important;
+  }
+
+  .medevac-line-field {
+    grid-column: 1 / -1 !important;
+  }
+
+  .medevac-bottom-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  .medevac-primary-action,
+  .medevac-secondary-action {
+    width: auto !important;
+  }
+}

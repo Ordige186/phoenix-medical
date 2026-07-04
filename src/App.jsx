@@ -10,6 +10,7 @@ const pages = [
   'Ship Supplies',
   'Supply Issue',
   'Medic Roster',
+  'Tools',
   'Activity Log',
   'Reports',
 ]
@@ -522,6 +523,10 @@ function App() {
         />
       )
     }
+
+if (activePage === 'Tools') {
+  return <Tools addActivity={addActivity} ships={ships} />
+}
 
     if (activePage === 'Activity Log') {
       return (
@@ -1779,6 +1784,260 @@ function MedicRoster({ roster, setRoster, isAdminMode, addActivity }) {
           <button type="submit">Add to Roster</button>
         </form>
       )}
+    </section>
+  )
+}
+
+function Tools({ addActivity, ships }) {
+const [medevacForm, setMedevacForm] = useState({
+  pickupLocation: '',
+  patientCount: '',
+  patientStatus: '',
+  security: '',
+  hazards: '',
+  callsign: '',
+  ship: ships?.[0]?.id || '',
+  priority: 'Routine',
+})
+
+  function updateMedevacField(field, value) {
+    setMedevacForm((current) => ({
+      ...current,
+      [field]: value,
+    }))
+  }
+
+  const selectedShip =
+    ships.find((ship) => ship.id === medevacForm.ship)?.name || 'N/A'
+
+  const medevacReport = `
+PHOENIX MEDEVAC 9-LINER
+
+1. PICKUP LOCATION:
+${medevacForm.pickupLocation || 'N/A'}
+
+2. NUMBER OF PATIENTS:
+${medevacForm.patientCount || 'N/A'}
+
+3. PATIENT STATUS:
+${medevacForm.patientStatus || 'N/A'}
+
+4. SECURITY AT PICKUP SITE:
+${medevacForm.security || 'N/A'}
+
+5. TERRAIN / HAZARDS:
+${medevacForm.hazards || 'N/A'}
+
+CALLSIGN:
+${medevacForm.callsign || 'N/A'}
+
+ASSIGNED SHIP:
+${selectedShip}
+
+PRIORITY:
+${medevacForm.priority || 'N/A'}
+`.trim()
+
+  function copyMedevacReport() {
+    navigator.clipboard.writeText(medevacReport)
+
+    addActivity('MEDEVAC 9-Liner copied to clipboard', undefined, '📡')
+
+    window.alert('MEDEVAC 9-Liner copied.')
+  }
+
+  function clearMedevacForm() {
+setMedevacForm({
+  pickupLocation: '',
+  patientCount: '',
+  patientStatus: '',
+  security: '',
+  hazards: '',
+  callsign: '',
+  ship: ships?.[0]?.id || '',
+  priority: 'Routine',
+})
+  }
+
+  return (
+    <section className="console-panel medevac-console-panel">
+      <div className="medevac-console-header">
+        <div className="medevac-title-block">
+          <h2>MEDEVAC 9-LINER</h2>
+          <span>Standard Request Format</span>
+        </div>
+      </div>
+
+      <div className="medevac-form-panel">
+        <div className="medevac-line-row">
+          <div className="medevac-line-number">1</div>
+
+          <div className="medevac-line-label">
+            <strong>Location</strong>
+            <small>Grid / nav marker / coordinates</small>
+          </div>
+
+          <div className="medevac-line-field">
+            <input
+              type="text"
+              placeholder="Enter location..."
+              value={medevacForm.pickupLocation}
+              onChange={(event) =>
+                updateMedevacField('pickupLocation', event.target.value)
+              }
+            />
+          </div>
+        </div>
+
+        <div className="medevac-line-row">
+          <div className="medevac-line-number">2</div>
+
+          <div className="medevac-line-label">
+            <strong>Number of Patients</strong>
+            <small>Total patients requiring extraction</small>
+          </div>
+
+          <div className="medevac-line-field">
+            <input
+              type="text"
+              placeholder="Enter patient count..."
+              value={medevacForm.patientCount}
+              onChange={(event) =>
+                updateMedevacField('patientCount', event.target.value)
+              }
+            />
+          </div>
+        </div>
+
+        <div className="medevac-line-row">
+          <div className="medevac-line-number">3</div>
+
+          <div className="medevac-line-label">
+            <strong>Patient Status</strong>
+            <small>Urgent / stable / incapacitated / bleeding</small>
+          </div>
+
+          <div className="medevac-line-field">
+            <textarea
+              placeholder="Enter patient status..."
+              value={medevacForm.patientStatus}
+              onChange={(event) =>
+                updateMedevacField('patientStatus', event.target.value)
+              }
+            />
+          </div>
+        </div>
+
+        <div className="medevac-line-row">
+          <div className="medevac-line-number">4</div>
+
+          <div className="medevac-line-label">
+            <strong>Security at Pickup Site</strong>
+            <small>Secure / hostile / unknown / overwatch required</small>
+          </div>
+
+          <div className="medevac-line-field">
+            <textarea
+              placeholder="Enter security situation..."
+              value={medevacForm.security}
+              onChange={(event) =>
+                updateMedevacField('security', event.target.value)
+              }
+            />
+          </div>
+        </div>
+
+        <div className="medevac-line-row">
+          <div className="medevac-line-number">5</div>
+
+          <div className="medevac-line-label">
+            <strong>Terrain / Hazards</strong>
+            <small>Weather / visibility / terrain / threats</small>
+          </div>
+
+          <div className="medevac-line-field">
+            <textarea
+              placeholder="Enter terrain or hazards..."
+              value={medevacForm.hazards}
+              onChange={(event) =>
+                updateMedevacField('hazards', event.target.value)
+              }
+            />
+          </div>
+        </div>
+
+        <div className="medevac-bottom-row">
+          <label>
+            <span>Callsign</span>
+            <input
+              type="text"
+              placeholder="e.g. Phoenix Actual"
+              value={medevacForm.callsign}
+              onChange={(event) =>
+                updateMedevacField('callsign', event.target.value)
+              }
+            />
+          </label>
+
+          <label>
+            <span>Ship</span>
+            <select
+              value={medevacForm.ship}
+              onChange={(event) => updateMedevacField('ship', event.target.value)}
+            >
+              {ships.map((ship) => (
+                <option key={ship.id} value={ship.id}>
+                  {ship.name}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <div className="priority-group">
+            <span>Priority</span>
+
+            <div className="priority-buttons">
+              {['Routine', 'Priority', 'Urgent'].map((priority) => (
+                <button
+                  key={priority}
+                  type="button"
+                  className={
+                    medevacForm.priority === priority
+                      ? 'priority-button active'
+                      : 'priority-button'
+                  }
+                  onClick={() => updateMedevacField('priority', priority)}
+                >
+                  {priority}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="medevac-actions">
+          <button
+            type="button"
+            className="medevac-primary-action"
+            onClick={copyMedevacReport}
+          >
+            Copy 9-Line Report
+          </button>
+
+          <button
+            type="button"
+            className="medevac-secondary-action"
+            onClick={clearMedevacForm}
+          >
+            Clear
+          </button>
+        </div>
+      </div>
+
+      <div className="medevac-preview-box">
+        <div className="medevac-preview-header">Generated Report</div>
+        <pre>{medevacReport}</pre>
+      </div>
     </section>
   )
 }
