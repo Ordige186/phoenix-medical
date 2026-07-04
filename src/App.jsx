@@ -436,6 +436,22 @@ function App() {
     }
   }
 
+    function updateShipStatus(shipId, newStatus) {
+    const ship = ships.find((item) => item.id === shipId)
+    const oldStatus = ship?.status || 'Unknown'
+
+    setShips((currentShips) =>
+      currentShips.map((item) =>
+        item.id === shipId ? { ...item, status: newStatus } : item,
+      ),
+    )
+
+    addActivity(
+      `${ship?.name || 'Ship'} status: ${oldStatus} → ${newStatus}`,
+      shipId,
+      '🚦',
+    )
+  }
   function clearAllRespawnsForShip(shipId) {
     const ship = ships.find((item) => item.id === shipId)
 
@@ -468,6 +484,7 @@ function App() {
           setBeds={setBeds}
           addActivity={addActivity}
           clearAllRespawnsForShip={clearAllRespawnsForShip}
+          updateShipStatus={updateShipStatus}
         />
       )
     }
@@ -705,6 +722,7 @@ function BedsAndRespawns({
   setBeds,
   addActivity,
   clearAllRespawnsForShip,
+  updateShipStatus,
 }) {
   const [viewMode, setViewMode] = useState('List View')
   const [draftBeds, setDraftBeds] = useState({})
@@ -899,6 +917,60 @@ function BedsAndRespawns({
         </div>
       </div>
 
+      <div className="ship-status-toolbar">
+        <div className="status-button-group">
+          <span className="toolbar-label">Status</span>
+
+          {['Active', 'Standby', 'Offline', 'OP Role'].map((status) => (
+            <button
+              key={status}
+              type="button"
+              className={
+                selectedShip.status === status
+                  ? 'status-action active'
+                  : 'status-action'
+              }
+              onClick={() => {
+                if (!isAdminMode) {
+                  window.alert('Admin Mode required to change ship status.')
+                  return
+                }
+
+                updateShipStatus(selectedShip.id, status)
+              }}
+            >
+              {status}
+            </button>
+          ))}
+        </div>
+
+        <div className="toolbar-actions">
+          <button
+            type="button"
+            className="toolbar-danger"
+            onClick={() => {
+              if (!isAdminMode) {
+                window.alert('Admin Mode required to clear imprints.')
+                return
+              }
+
+              clearAllRespawnsForShip(selectedShip.id)
+            }}
+          >
+            Clear Imprints
+          </button>
+
+          <button
+            type="button"
+            className="toolbar-danger outline"
+            onClick={() => {
+              window.alert('Ship removal can be added later. For now, ships are locked to Phoenix Medical assets.')
+            }}
+          >
+            × Remove
+          </button>
+        </div>
+      </div>
       <div className="console-tabs">
         <button
           className={viewMode === 'List View' ? 'active' : ''}
