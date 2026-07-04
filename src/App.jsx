@@ -390,7 +390,14 @@ function App() {
     operations={operations}
   />
 )}
-      </main>
+        </main>
+
+      <div className="system-bar">
+        <span>Phoenix Squadron Medical Portal</span>
+        <span>Mode: {isAdminMode ? 'Admin' : 'View'}</span>
+        <span>System: Online</span>
+        <span>Last Updated: {new Date().toLocaleTimeString()}</span>
+      </div>
     </div>
   )
 }
