@@ -2108,22 +2108,59 @@ function ActivityLog({ activityLog, clearLog, isAdminMode }) {
 }
 
 function Reports({ ships, beds, supplies, activityLog }) {
+  const totalBeds = beds.length
+  const occupiedBeds = beds.filter(
+    (bed) => bed.status === 'Occupied' || bed.respawns.length > 0,
+  )
+  const offlineBeds = beds.filter((bed) => bed.status === 'Offline')
+  const totalRespawns = beds.reduce(
+    (sum, bed) => sum + bed.respawns.length,
+    0,
+  )
+
+  const totalMedGelCurrent = beds.reduce(
+    (sum, bed) => sum + Number(bed.medGelCurrent || 0),
+    0,
+  )
+  const totalMedGelMax = beds.reduce(
+    (sum, bed) => sum + Number(bed.medGelMax || 0),
+    0,
+  )
+
+  const medGelPercent =
+    totalMedGelMax > 0
+      ? Math.round((totalMedGelCurrent / totalMedGelMax) * 100)
+      : 0
+
+  const lowSupplies = supplies.filter((item) => item.quantity <= 10)
+  const activeShips = ships.filter((ship) => ship.status === 'Active')
+  const standbyShips = ships.filter((ship) => ship.status === 'Standby')
+  const offlineShips = ships.filter((ship) => ship.status === 'Offline')
+
+  const recentActivity = activityLog.slice(0, 8)
+
   const reportText = useMemo(() => {
-    const occupiedBeds = beds.filter(
-      (bed) => bed.status === 'Occupied' || bed.respawns.length > 0,
-    )
-
-    const lowSupplies = supplies.filter((item) => item.quantity <= 10)
-
     return `
-PHOENIX SQUADRON MEDICAL REPORT
+PHOENIX SQUADRON MEDICAL COMMAND REPORT
 Generated: ${new Date().toLocaleString()}
 
-FLEET SHIPS
+FLEET STATUS
+- Active Ships: ${activeShips.length}
+- Standby Ships: ${standbyShips.length}
+- Offline Ships: ${offlineShips.length}
+
+SHIP LIST
 ${ships.map((ship) => `- ${ship.name}: ${ship.status} / ${ship.configuration}`).join('\n')}
 
-BEDS OCCUPIED
-${occupiedBeds.length} / ${beds.length}
+BED STATUS
+- Occupied Beds: ${occupiedBeds.length} / ${totalBeds}
+- Offline Beds: ${offlineBeds.length}
+- Active Respawn Imprints: ${totalRespawns}
+
+MEDGEL STATUS
+- Current MedGel: ${totalMedGelCurrent} cSCU
+- Maximum Capacity: ${totalMedGelMax} cSCU
+- Capacity: ${medGelPercent}%
 
 LOW SUPPLIES
 ${
@@ -2133,32 +2170,158 @@ ${
 }
 
 RECENT ACTIVITY
-${activityLog
-  .slice(0, 10)
-  .map((entry) => `- ${entry.time}: ${entry.message}`)
-  .join('\n')}
+${
+  recentActivity.length > 0
+    ? recentActivity
+        .map((entry) => `- ${entry.time}: ${entry.message}`)
+        .join('\n')
+    : '- No recent activity recorded.'
+}
 `.trim()
-  }, [ships, beds, supplies, activityLog])
+  }, [
+    activeShips.length,
+    standbyShips.length,
+    offlineShips.length,
+    ships,
+    occupiedBeds.length,
+    totalBeds,
+    offlineBeds.length,
+    totalRespawns,
+    totalMedGelCurrent,
+    totalMedGelMax,
+    medGelPercent,
+    lowSupplies,
+    recentActivity,
+  ])
 
   function copyReport() {
     navigator.clipboard.writeText(reportText)
-    window.alert('Report copied to clipboard.')
+    window.alert('Command report copied to clipboard.')
   }
 
   return (
-    <section className="console-panel">
+    <section className="console-panel reports-panel">
       <div className="panel-command-row">
         <div>
-          <p className="section-kicker">Reports</p>
-          <h2>Command Report</h2>
+          <p className="section-kicker">Command</p>
+          <h2>Reports</h2>
         </div>
 
         <button className="console-button" onClick={copyReport}>
-          Copy Report
+          Copy Command Report
         </button>
       </div>
 
-      <pre className="report-box">{reportText}</pre>
+      <div className="report-card-grid">
+        <article className="report-card">
+          <span>Fleet Status</span>
+          <strong>{activeShips.length}</strong>
+          <small>active ships</small>
+
+          <div className="report-mini-list">
+            <em>{standbyShips.length} standby</em>
+            <em>{offlineShips.length} offline</em>
+          </div>
+        </article>
+
+        <article className="report-card">
+          <span>Bed Status</span>
+          <strong>
+            {occupiedBeds.length}/{totalBeds}
+          </strong>
+          <small>occupied beds</small>
+
+          <div className="report-mini-list">
+            <em>{totalRespawns} respawn imprints</em>
+            <em>{offlineBeds.length} offline beds</em>
+          </div>
+        </article>
+
+        <article className="report-card">
+          <span>MedGel Status</span>
+          <strong>{medGelPercent}%</strong>
+          <small>
+            {totalMedGelCurrent}/{totalMedGelMax} cSCU
+          </small>
+
+          <div className="report-meter">
+            <div style={{ width: `${medGelPercent}%` }} />
+          </div>
+        </article>
+
+        <article className="report-card">
+          <span>Supply Status</span>
+          <strong>{lowSupplies.length}</strong>
+          <small>low supply warnings</small>
+
+          <div className="report-mini-list">
+            {lowSupplies.length > 0 ? (
+              lowSupplies.slice(0, 2).map((item) => (
+                <em key={item.id}>
+                  {item.name}: {item.quantity}
+                </em>
+              ))
+            ) : (
+              <em>Inventory stable</em>
+            )}
+          </div>
+        </article>
+      </div>
+
+      <div className="report-section-grid">
+        <article className="report-section">
+          <div className="report-section-header">
+            <span>Fleet Assets</span>
+            <small>{ships.length} total</small>
+          </div>
+
+          <div className="report-list">
+            {ships.map((ship) => (
+              <div className="report-list-row" key={ship.id}>
+                <div>
+                  <strong>{ship.name}</strong>
+                  <small>{ship.className}</small>
+                </div>
+
+                <em>{ship.status}</em>
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <article className="report-section">
+          <div className="report-section-header">
+            <span>Recent Activity</span>
+            <small>{recentActivity.length} shown</small>
+          </div>
+
+          <div className="report-list">
+            {recentActivity.length === 0 ? (
+              <p className="report-empty">No recent activity recorded.</p>
+            ) : (
+              recentActivity.map((entry) => (
+                <div className="report-list-row activity-summary-row" key={entry.id}>
+                  <div>
+                    <strong>{entry.message}</strong>
+                    <small>{entry.ship}</small>
+                  </div>
+
+                  <em>{entry.time}</em>
+                </div>
+              ))
+            )}
+          </div>
+        </article>
+      </div>
+
+      <div className="report-output">
+        <div className="report-section-header">
+          <span>Copy Preview</span>
+          <small>Discord ready</small>
+        </div>
+
+        <pre>{reportText}</pre>
+      </div>
     </section>
   )
 }

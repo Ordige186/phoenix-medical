@@ -2923,3 +2923,201 @@ body {
 .sidebar-nav-section:last-of-type {
   padding-bottom: 12px;
 }
+/* ================================
+   Reports Page Cleanup
+   ================================ */
+
+.reports-panel {
+  overflow: hidden;
+}
+
+.report-card-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(180px, 1fr));
+  gap: 14px;
+  padding: 20px 20px 12px;
+}
+
+.report-card {
+  min-height: 160px;
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid rgba(125, 211, 252, 0.16);
+  border-radius: 10px;
+  background:
+    linear-gradient(180deg, rgba(8, 15, 25, 0.96), rgba(3, 7, 12, 0.96));
+}
+
+.report-card span {
+  color: #ef4444;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.report-card strong {
+  color: #dbeafe;
+  font-size: 38px;
+  line-height: 1;
+  letter-spacing: 1px;
+}
+
+.report-card small {
+  color: #7ea3bf;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.report-mini-list {
+  display: grid;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.report-mini-list em {
+  color: #8ea6b8;
+  font-size: 12px;
+  font-style: normal;
+}
+
+.report-meter {
+  height: 8px;
+  margin-top: 10px;
+  border-radius: 999px;
+  background: rgba(125, 211, 252, 0.12);
+  overflow: hidden;
+}
+
+.report-meter div {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #18d6a3, #94f2d4);
+  box-shadow: 0 0 14px rgba(24, 214, 163, 0.28);
+}
+
+.report-section-grid {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 14px;
+  padding: 8px 20px 14px;
+}
+
+.report-section,
+.report-output {
+  border: 1px solid rgba(125, 211, 252, 0.16);
+  border-radius: 10px;
+  background: rgba(4, 10, 18, 0.74);
+  overflow: hidden;
+}
+
+.report-section-header {
+  min-height: 44px;
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+  padding: 0 14px;
+  border-bottom: 1px solid rgba(125, 211, 252, 0.12);
+  background: rgba(239, 68, 68, 0.06);
+}
+
+.report-section-header span {
+  color: #dbeafe;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.report-section-header small {
+  color: #7ea3bf;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.report-list {
+  display: grid;
+}
+
+.report-list-row {
+  min-height: 58px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 14px;
+  align-items: center;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(125, 211, 252, 0.09);
+}
+
+.report-list-row:last-child {
+  border-bottom: none;
+}
+
+.report-list-row strong {
+  display: block;
+  color: #dbeafe;
+  font-size: 13px;
+}
+
+.report-list-row small {
+  display: block;
+  margin-top: 2px;
+  color: #7ea3bf;
+  font-size: 11px;
+}
+
+.report-list-row em {
+  color: #fecaca;
+  font-size: 11px;
+  font-style: normal;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.activity-summary-row strong {
+  font-size: 12px;
+}
+
+.report-empty {
+  margin: 0;
+  padding: 16px;
+  color: #7ea3bf;
+  font-size: 12px;
+}
+
+.report-output {
+  margin: 4px 20px 22px;
+}
+
+.report-output pre {
+  max-height: 360px;
+  margin: 0;
+  padding: 16px;
+  overflow: auto;
+  color: #dbeafe;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+@media (max-width: 1300px) {
+  .report-card-grid {
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
+  }
+
+  .report-section-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .report-card-grid {
+    grid-template-columns: 1fr;
+  }
+}
