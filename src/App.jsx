@@ -347,6 +347,9 @@ function App() {
   const [supplies, setSupplies] = useState(() =>
     loadStoredData('phoenixSupplies', startingSupplies),
   )
+  const [roster, setRoster] = useState(() =>
+    loadStoredData('phoenixRoster', startingRoster),
+  )
   const [activityLog, setActivityLog] = useState(() =>
     loadStoredData('phoenixActivityLog', []),
   )
@@ -362,6 +365,10 @@ function App() {
   useEffect(() => {
     localStorage.setItem('phoenixSupplies', JSON.stringify(supplies))
   }, [supplies])
+
+  useEffect(() => {
+    localStorage.setItem('phoenixRoster', JSON.stringify(roster))
+  }, [roster])
 
   useEffect(() => {
     localStorage.setItem('phoenixActivityLog', JSON.stringify(activityLog))
@@ -506,7 +513,14 @@ function App() {
     }
 
     if (activePage === 'Medic Roster') {
-      return <MedicRoster />
+      return (
+        <MedicRoster
+          roster={roster}
+          setRoster={setRoster}
+          isAdminMode={isAdminMode}
+          addActivity={addActivity}
+        />
+      )
     }
 
     if (activePage === 'Activity Log') {
@@ -1571,30 +1585,200 @@ function SupplyIssue({ ships, supplies, setSupplies, addActivity, isAdminMode })
   )
 }
 
-function MedicRoster() {
+function MedicRoster({ roster, setRoster, isAdminMode, addActivity }) {
+  const [newMedic, setNewMedic] = useState({
+    name: '',
+    callsign: '',
+    role: '',
+    status: 'Active',
+  })
+
+  function updateNewMedic(field, value) {
+    setNewMedic((current) => ({
+      ...current,
+      [field]: value,
+    }))
+  }
+
+  function addMedic(event) {
+    event.preventDefault()
+
+    if (!isAdminMode) {
+      window.alert('Admin Mode required to add roster members.')
+      return
+    }
+
+    if (!newMedic.name.trim() || !newMedic.callsign.trim()) {
+      window.alert('Name and callsign are required.')
+      return
+    }
+
+    const medicEntry = {
+      id: crypto.randomUUID(),
+      name: newMedic.name.trim(),
+      callsign: newMedic.callsign.trim(),
+      role: newMedic.role.trim() || 'Corpsman',
+      status: newMedic.status,
+    }
+
+    setRoster((currentRoster) => [...currentRoster, medicEntry])
+
+    addActivity(
+      `${medicEntry.callsign} added to Medic Roster as ${medicEntry.role}`,
+      undefined,
+      '🪪',
+    )
+
+    setNewMedic({
+      name: '',
+      callsign: '',
+      role: '',
+      status: 'Active',
+    })
+  }
+
+  function updateMedicStatus(member, newStatus) {
+    if (!isAdminMode) {
+      window.alert('Admin Mode required to update roster status.')
+      return
+    }
+
+    setRoster((currentRoster) =>
+      currentRoster.map((item) =>
+        item.callsign === member.callsign ? { ...item, status: newStatus } : item,
+      ),
+    )
+
+    addActivity(
+      `${member.callsign} roster status changed to ${newStatus}`,
+      undefined,
+      '🚦',
+    )
+  }
+
+  function removeMedic(member) {
+    if (!isAdminMode) {
+      window.alert('Admin Mode required to remove roster members.')
+      return
+    }
+
+    const confirmed = window.confirm(
+      `Remove ${member.callsign} from the Medic Roster?`,
+    )
+
+    if (!confirmed) return
+
+    setRoster((currentRoster) =>
+      currentRoster.filter((item) => item.callsign !== member.callsign),
+    )
+
+    addActivity(`${member.callsign} removed from Medic Roster`, undefined, '🗑️')
+  }
+
   return (
-    <section className="console-panel">
+    <section className="console-panel medic-roster-panel">
       <div className="panel-command-row">
         <div>
           <p className="section-kicker">Personnel</p>
           <h2>Medic Roster</h2>
         </div>
+
+        <div className="panel-actions">
+          <span>{roster.length} personnel</span>
+        </div>
       </div>
 
-      <div className="supply-list">
-        {startingRoster.map((member) => (
-          <div className="supply-row" key={member.callsign}>
-            <div>
-              <strong>{member.name}</strong>
-              <span>
-                {member.callsign} • {member.role}
-              </span>
-            </div>
+      <div className="roster-table">
+        <div className="roster-table-header">
+          <span>Name</span>
+          <span>Callsign</span>
+          <span>Role</span>
+          <span>Status</span>
+          <span>Actions</span>
+        </div>
 
-            <em>{member.status}</em>
+        {roster.map((member) => (
+          <div className="roster-table-row" key={member.id || member.callsign}>
+            <strong>{member.name}</strong>
+            <span>{member.callsign}</span>
+            <span>{member.role}</span>
+
+            <select
+              value={member.status}
+              disabled={!isAdminMode}
+              onChange={(event) => updateMedicStatus(member, event.target.value)}
+            >
+              <option>Active</option>
+              <option>Standby</option>
+              <option>On Leave</option>
+              <option>Training</option>
+              <option>Inactive</option>
+            </select>
+
+            <button type="button" onClick={() => removeMedic(member)}>
+              Remove
+            </button>
           </div>
         ))}
       </div>
+
+      {isAdminMode && (
+        <form className="add-medic-form" onSubmit={addMedic}>
+          <div className="respawn-roster-header">
+            <span>Add Medic</span>
+            <small>Admin Mode</small>
+          </div>
+
+          <div className="add-medic-grid">
+            <label>
+              Name
+              <input
+                placeholder="Name..."
+                value={newMedic.name}
+                onChange={(event) => updateNewMedic('name', event.target.value)}
+              />
+            </label>
+
+            <label>
+              Callsign
+              <input
+                placeholder="Callsign..."
+                value={newMedic.callsign}
+                onChange={(event) =>
+                  updateNewMedic('callsign', event.target.value)
+                }
+              />
+            </label>
+
+            <label>
+              Role
+              <input
+                placeholder="Corpsman, Pilot, CMO..."
+                value={newMedic.role}
+                onChange={(event) => updateNewMedic('role', event.target.value)}
+              />
+            </label>
+
+            <label>
+              Status
+              <select
+                value={newMedic.status}
+                onChange={(event) =>
+                  updateNewMedic('status', event.target.value)
+                }
+              >
+                <option>Active</option>
+                <option>Standby</option>
+                <option>On Leave</option>
+                <option>Training</option>
+                <option>Inactive</option>
+              </select>
+            </label>
+          </div>
+
+          <button type="submit">Add to Roster</button>
+        </form>
+      )}
     </section>
   )
 }

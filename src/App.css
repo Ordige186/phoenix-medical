@@ -2312,3 +2312,142 @@ body {
 .selected-bed-card .bed-card-header > span {
   color: #fecaca !important;
 }
+/* ================================
+   Medic Roster Page
+   ================================ */
+
+.medic-roster-panel {
+  overflow: hidden;
+}
+
+.roster-table {
+  margin: 18px 20px;
+  border: 1px solid rgba(125, 211, 252, 0.16);
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(4, 10, 18, 0.72);
+}
+
+.roster-table-header,
+.roster-table-row {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 1.2fr 150px 110px;
+  gap: 12px;
+  align-items: center;
+}
+
+.roster-table-header {
+  min-height: 42px;
+  padding: 0 14px;
+  border-bottom: 1px solid rgba(125, 211, 252, 0.16);
+  background: rgba(239, 68, 68, 0.08);
+  color: #fecaca;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.roster-table-row {
+  min-height: 58px;
+  padding: 9px 14px;
+  border-bottom: 1px solid rgba(125, 211, 252, 0.1);
+}
+
+.roster-table-row:last-child {
+  border-bottom: none;
+}
+
+.roster-table-row strong {
+  color: #dbeafe;
+  font-size: 14px;
+}
+
+.roster-table-row span {
+  color: #8ea6b8;
+  font-size: 13px;
+}
+
+.roster-table-row select,
+.roster-table-row button,
+.add-medic-form input,
+.add-medic-form select,
+.add-medic-form button {
+  min-height: 34px;
+  border: 1px solid rgba(125, 211, 252, 0.18);
+  border-radius: 6px;
+  background: rgba(2, 8, 14, 0.9);
+  color: #dbeafe;
+  font-family: inherit;
+  font-size: 12px;
+}
+
+.roster-table-row select:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.roster-table-row button {
+  border-color: rgba(239, 68, 68, 0.32);
+  color: #fecaca;
+  cursor: pointer;
+}
+
+.roster-table-row button:hover {
+  background: rgba(239, 68, 68, 0.12);
+}
+
+.add-medic-form {
+  margin: 0 20px 22px;
+  padding: 16px;
+  border: 1px solid rgba(125, 211, 252, 0.16);
+  border-radius: 8px;
+  background: rgba(4, 10, 18, 0.72);
+}
+
+.add-medic-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.2fr 160px;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.add-medic-form label {
+  display: grid;
+  gap: 6px;
+  color: #7ea3bf;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.add-medic-form input,
+.add-medic-form select {
+  padding: 0 10px;
+}
+
+.add-medic-form button {
+  width: 180px;
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #fecaca;
+  cursor: pointer;
+}
+
+.add-medic-form button:hover {
+  background: rgba(239, 68, 68, 0.12);
+}
+
+@media (max-width: 1100px) {
+  .roster-table-header {
+    display: none;
+  }
+
+  .roster-table-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .add-medic-grid {
+    grid-template-columns: 1fr;
+  }
+}
