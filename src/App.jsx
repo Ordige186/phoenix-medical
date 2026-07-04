@@ -365,15 +365,15 @@ function App() {
   const [beds, setBeds] = useState(() =>
     loadStoredData('phoenixBeds', startingBeds),
   )
-  const [supplies, setSupplies] = useState(() =>
-    loadStoredData('phoenixSupplies', startingSupplies),
-  )
-  const [roster, setRoster] = useState(() =>
-    loadStoredData('phoenixRoster', startingRoster),
-  )
-  const [activityLog, setActivityLog] = useState(() =>
-    loadStoredData('phoenixActivityLog', []),
-  )
+const [supplies, setSupplies] = useState(() =>
+  loadStoredData('phoenixSupplies', startingSupplies),
+)
+const [roster, setRoster] = useState(() =>
+  loadStoredData('phoenixRoster', startingRoster),
+)
+const [activityLog, setActivityLog] = useState(() =>
+  loadStoredData('phoenixActivityLog', []),
+)
 
   useEffect(() => {
     localStorage.setItem('phoenixShips', JSON.stringify(ships))
@@ -383,17 +383,17 @@ function App() {
     localStorage.setItem('phoenixBeds', JSON.stringify(beds))
   }, [beds])
 
-  useEffect(() => {
-    localStorage.setItem('phoenixSupplies', JSON.stringify(supplies))
-  }, [supplies])
+useEffect(() => {
+  localStorage.setItem('phoenixSupplies', JSON.stringify(supplies))
+}, [supplies])
 
-  useEffect(() => {
-    localStorage.setItem('phoenixRoster', JSON.stringify(roster))
-  }, [roster])
+useEffect(() => {
+  localStorage.setItem('phoenixRoster', JSON.stringify(roster))
+}, [roster])
 
-  useEffect(() => {
-    localStorage.setItem('phoenixActivityLog', JSON.stringify(activityLog))
-  }, [activityLog])
+useEffect(() => {
+  localStorage.setItem('phoenixActivityLog', JSON.stringify(activityLog))
+}, [activityLog])
 
   useEffect(() => {
     if (isAuthenticated) return
@@ -533,16 +533,16 @@ function App() {
       )
     }
 
-    if (activePage === 'Medic Roster') {
-      return (
-        <MedicRoster
-          roster={roster}
-          setRoster={setRoster}
-          isAdminMode={isAdminMode}
-          addActivity={addActivity}
-        />
-      )
-    }
+if (activePage === 'Medic Roster') {
+  return (
+    <MedicRoster
+      roster={roster}
+      setRoster={setRoster}
+      isAdminMode={isAdminMode}
+      addActivity={addActivity}
+    />
+  )
+}
 
 if (activePage === 'MEDEVAC 9-Liner') {
   return <Tools addActivity={addActivity} ships={ships} />
@@ -1618,12 +1618,45 @@ function SupplyIssue({ ships, supplies, setSupplies, addActivity, isAdminMode })
 }
 
 function MedicRoster({ roster, setRoster, isAdminMode, addActivity }) {
+  const roles = [
+    'Medical Command',
+    'Corpsman',
+    'Combat Medic',
+    'CASEVAC Pilot',
+    'Dropship Pilot',
+    'SAR Crew',
+    'Scout / Recon',
+    'Trainee',
+  ]
+
+  const statuses = ['Active', 'Standby', 'Training', 'On Leave', 'Inactive']
+
+  const units = [
+    'Phoenix Squadron',
+    'Idris Medical Bay',
+    'Apollo Detachment',
+    'C8R Rescue Team',
+    'Terrapin Medic',
+    'Marine Attachment',
+    'Recon Attachment',
+  ]
+
   const [newMedic, setNewMedic] = useState({
     name: '',
     callsign: '',
-    role: '',
+    role: 'Corpsman',
     status: 'Active',
+    unit: 'Phoenix Squadron',
   })
+
+  const activeCount = roster.filter((member) => member.status === 'Active').length
+  const standbyCount = roster.filter((member) => member.status === 'Standby').length
+  const trainingCount = roster.filter(
+    (member) => member.status === 'Training',
+  ).length
+  const commandCount = roster.filter(
+    (member) => member.role === 'Medical Command',
+  ).length
 
   function updateNewMedic(field, value) {
     setNewMedic((current) => ({
@@ -1649,8 +1682,9 @@ function MedicRoster({ roster, setRoster, isAdminMode, addActivity }) {
       id: crypto.randomUUID(),
       name: newMedic.name.trim(),
       callsign: newMedic.callsign.trim(),
-      role: newMedic.role.trim() || 'Corpsman',
+      role: newMedic.role,
       status: newMedic.status,
+      unit: newMedic.unit,
     }
 
     setRoster((currentRoster) => [...currentRoster, medicEntry])
@@ -1658,33 +1692,36 @@ function MedicRoster({ roster, setRoster, isAdminMode, addActivity }) {
     addActivity(
       `${medicEntry.callsign} added to Medic Roster as ${medicEntry.role}`,
       undefined,
-      '🪪',
+      '☤',
     )
 
     setNewMedic({
       name: '',
       callsign: '',
-      role: '',
+      role: 'Corpsman',
       status: 'Active',
+      unit: 'Phoenix Squadron',
     })
   }
 
-  function updateMedicStatus(member, newStatus) {
+  function updateMedicField(member, field, value) {
     if (!isAdminMode) {
-      window.alert('Admin Mode required to update roster status.')
+      window.alert('Admin Mode required to edit roster members.')
       return
     }
 
     setRoster((currentRoster) =>
       currentRoster.map((item) =>
-        item.callsign === member.callsign ? { ...item, status: newStatus } : item,
+        (item.id || item.callsign) === (member.id || member.callsign)
+          ? { ...item, [field]: value }
+          : item,
       ),
     )
 
     addActivity(
-      `${member.callsign} roster status changed to ${newStatus}`,
+      `${member.callsign} roster ${field} changed to ${value}`,
       undefined,
-      '🚦',
+      '☤',
     )
   }
 
@@ -1701,7 +1738,9 @@ function MedicRoster({ roster, setRoster, isAdminMode, addActivity }) {
     if (!confirmed) return
 
     setRoster((currentRoster) =>
-      currentRoster.filter((item) => item.callsign !== member.callsign),
+      currentRoster.filter(
+        (item) => (item.id || item.callsign) !== (member.id || member.callsign),
+      ),
     )
 
     addActivity(`${member.callsign} removed from Medic Roster`, undefined, '🗑️')
@@ -1720,32 +1759,96 @@ function MedicRoster({ roster, setRoster, isAdminMode, addActivity }) {
         </div>
       </div>
 
-      <div className="roster-table">
-        <div className="roster-table-header">
+      <div className="roster-summary-grid">
+        <article className="roster-summary-card">
+          <span>Active</span>
+          <strong>{activeCount}</strong>
+          <small>personnel active</small>
+        </article>
+
+        <article className="roster-summary-card">
+          <span>Standby</span>
+          <strong>{standbyCount}</strong>
+          <small>personnel on standby</small>
+        </article>
+
+        <article className="roster-summary-card">
+          <span>Training</span>
+          <strong>{trainingCount}</strong>
+          <small>training status</small>
+        </article>
+
+        <article className="roster-summary-card">
+          <span>Command</span>
+          <strong>{commandCount}</strong>
+          <small>medical command</small>
+        </article>
+      </div>
+
+      <div className="personnel-board">
+        <div className="personnel-board-header">
           <span>Name</span>
           <span>Callsign</span>
           <span>Role</span>
           <span>Status</span>
+          <span>Assigned Unit</span>
           <span>Actions</span>
         </div>
 
         {roster.map((member) => (
-          <div className="roster-table-row" key={member.id || member.callsign}>
+          <div
+            className="personnel-board-row"
+            key={member.id || member.callsign}
+          >
             <strong>{member.name}</strong>
             <span>{member.callsign}</span>
-            <span>{member.role}</span>
 
-            <select
-              value={member.status}
-              disabled={!isAdminMode}
-              onChange={(event) => updateMedicStatus(member, event.target.value)}
-            >
-              <option>Active</option>
-              <option>Standby</option>
-              <option>On Leave</option>
-              <option>Training</option>
-              <option>Inactive</option>
-            </select>
+            {isAdminMode ? (
+              <select
+                value={member.role}
+                onChange={(event) =>
+                  updateMedicField(member, 'role', event.target.value)
+                }
+              >
+                {roles.map((role) => (
+                  <option key={role}>{role}</option>
+                ))}
+              </select>
+            ) : (
+              <span>{member.role}</span>
+            )}
+
+            {isAdminMode ? (
+              <select
+                value={member.status}
+                onChange={(event) =>
+                  updateMedicField(member, 'status', event.target.value)
+                }
+              >
+                {statuses.map((status) => (
+                  <option key={status}>{status}</option>
+                ))}
+              </select>
+            ) : (
+              <em className={`roster-status ${member.status.toLowerCase().replaceAll(' ', '-')}`}>
+                {member.status}
+              </em>
+            )}
+
+            {isAdminMode ? (
+              <select
+                value={member.unit || 'Phoenix Squadron'}
+                onChange={(event) =>
+                  updateMedicField(member, 'unit', event.target.value)
+                }
+              >
+                {units.map((unit) => (
+                  <option key={unit}>{unit}</option>
+                ))}
+              </select>
+            ) : (
+              <span>{member.unit || 'Phoenix Squadron'}</span>
+            )}
 
             <button type="button" onClick={() => removeMedic(member)}>
               Remove
@@ -1755,13 +1858,15 @@ function MedicRoster({ roster, setRoster, isAdminMode, addActivity }) {
       </div>
 
       {isAdminMode && (
-        <form className="add-medic-form" onSubmit={addMedic}>
-          <div className="respawn-roster-header">
-            <span>Add Medic</span>
-            <small>Admin Mode</small>
+        <form className="add-personnel-card" onSubmit={addMedic}>
+          <div className="add-personnel-header">
+            <div>
+              <p className="section-kicker">Admin Mode</p>
+              <h3>Add Personnel</h3>
+            </div>
           </div>
 
-          <div className="add-medic-grid">
+          <div className="add-personnel-grid">
             <label>
               Name
               <input
@@ -1784,11 +1889,14 @@ function MedicRoster({ roster, setRoster, isAdminMode, addActivity }) {
 
             <label>
               Role
-              <input
-                placeholder="Corpsman, Pilot, CMO..."
+              <select
                 value={newMedic.role}
                 onChange={(event) => updateNewMedic('role', event.target.value)}
-              />
+              >
+                {roles.map((role) => (
+                  <option key={role}>{role}</option>
+                ))}
+              </select>
             </label>
 
             <label>
@@ -1799,11 +1907,21 @@ function MedicRoster({ roster, setRoster, isAdminMode, addActivity }) {
                   updateNewMedic('status', event.target.value)
                 }
               >
-                <option>Active</option>
-                <option>Standby</option>
-                <option>On Leave</option>
-                <option>Training</option>
-                <option>Inactive</option>
+                {statuses.map((status) => (
+                  <option key={status}>{status}</option>
+                ))}
+              </select>
+            </label>
+
+            <label>
+              Assigned Unit
+              <select
+                value={newMedic.unit}
+                onChange={(event) => updateNewMedic('unit', event.target.value)}
+              >
+                {units.map((unit) => (
+                  <option key={unit}>{unit}</option>
+                ))}
               </select>
             </label>
           </div>
@@ -1814,7 +1932,6 @@ function MedicRoster({ roster, setRoster, isAdminMode, addActivity }) {
     </section>
   )
 }
-
 function Tools({ addActivity, ships }) {
 const [medevacForm, setMedevacForm] = useState({
   pickupLocation: '',

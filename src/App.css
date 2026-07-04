@@ -3121,3 +3121,277 @@ body {
     grid-template-columns: 1fr;
   }
 }
+/* ================================
+   Medic Roster Personnel Board
+   ================================ */
+
+.medic-roster-panel {
+  overflow: hidden;
+}
+
+.roster-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(170px, 1fr));
+  gap: 14px;
+  padding: 20px 20px 12px;
+}
+
+.roster-summary-card {
+  min-height: 132px;
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid rgba(125, 211, 252, 0.16);
+  border-radius: 10px;
+  background:
+    linear-gradient(180deg, rgba(8, 15, 25, 0.96), rgba(3, 7, 12, 0.96));
+}
+
+.roster-summary-card span {
+  color: #ef4444;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.roster-summary-card strong {
+  color: #dbeafe;
+  font-size: 38px;
+  line-height: 1;
+}
+
+.roster-summary-card small {
+  color: #7ea3bf;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.personnel-board {
+  margin: 8px 20px 16px;
+  border: 1px solid rgba(125, 211, 252, 0.16);
+  border-radius: 10px;
+  background: rgba(4, 10, 18, 0.74);
+  overflow: hidden;
+}
+
+.personnel-board-header,
+.personnel-board-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1.15fr 150px 1.2fr 100px;
+  gap: 12px;
+  align-items: center;
+}
+
+.personnel-board-header {
+  min-height: 44px;
+  padding: 0 14px;
+  border-bottom: 1px solid rgba(125, 211, 252, 0.12);
+  background: rgba(239, 68, 68, 0.06);
+}
+
+.personnel-board-header span {
+  color: #dbeafe;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.personnel-board-row {
+  min-height: 58px;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(125, 211, 252, 0.09);
+}
+
+.personnel-board-row:last-child {
+  border-bottom: none;
+}
+
+.personnel-board-row strong {
+  color: #dbeafe;
+  font-size: 13px;
+}
+
+.personnel-board-row span {
+  color: #8ea6b8;
+  font-size: 12px;
+}
+
+.personnel-board-row select,
+.add-personnel-card input,
+.add-personnel-card select {
+  width: 100%;
+  min-height: 34px;
+  border: 1px solid rgba(125, 211, 252, 0.18);
+  border-radius: 6px;
+  background: rgba(2, 8, 14, 0.9);
+  color: #dbeafe;
+  font-family: inherit;
+  font-size: 12px;
+  padding: 0 8px;
+  outline: none;
+}
+
+.personnel-board-row select:focus,
+.add-personnel-card input:focus,
+.add-personnel-card select:focus {
+  border-color: rgba(239, 68, 68, 0.55);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.personnel-board-row button {
+  min-height: 32px;
+  border: 1px solid rgba(239, 68, 68, 0.32);
+  border-radius: 6px;
+  background: rgba(239, 68, 68, 0.08);
+  color: #fecaca;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.personnel-board-row button:hover {
+  background: rgba(239, 68, 68, 0.15);
+}
+
+.roster-status {
+  width: fit-content;
+  min-width: 78px;
+  min-height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(125, 211, 252, 0.18);
+  border-radius: 999px;
+  color: #dbeafe;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.roster-status.active {
+  border-color: rgba(24, 214, 163, 0.35);
+  background: rgba(24, 214, 163, 0.08);
+  color: #8ef5d4;
+}
+
+.roster-status.standby {
+  border-color: rgba(56, 189, 248, 0.35);
+  background: rgba(56, 189, 248, 0.08);
+  color: #7dd3fc;
+}
+
+.roster-status.training {
+  border-color: rgba(250, 204, 21, 0.35);
+  background: rgba(250, 204, 21, 0.08);
+  color: #fde68a;
+}
+
+.roster-status.on-leave,
+.roster-status.inactive {
+  border-color: rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.08);
+  color: #fecaca;
+}
+
+.add-personnel-card {
+  margin: 0 20px 22px;
+  border: 1px solid rgba(125, 211, 252, 0.16);
+  border-radius: 10px;
+  background: rgba(4, 10, 18, 0.74);
+  overflow: hidden;
+}
+
+.add-personnel-header {
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  border-bottom: 1px solid rgba(125, 211, 252, 0.12);
+  background: rgba(239, 68, 68, 0.06);
+}
+
+.add-personnel-header h3 {
+  margin: 2px 0 0;
+  color: #dbeafe;
+  font-size: 16px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.add-personnel-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.1fr 150px 1.2fr;
+  gap: 12px;
+  padding: 16px;
+}
+
+.add-personnel-card label {
+  display: grid;
+  gap: 7px;
+  color: #7ea3bf;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.add-personnel-card button {
+  min-height: 42px;
+  margin: 0 16px 16px;
+  padding: 0 18px;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: 7px;
+  background: rgba(239, 68, 68, 0.1);
+  color: #fecaca;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.add-personnel-card button:hover {
+  background: rgba(239, 68, 68, 0.16);
+}
+
+@media (max-width: 1350px) {
+  .personnel-board-header,
+  .personnel-board-row {
+    grid-template-columns: 1.1fr 0.9fr 1fr 130px 1fr 90px;
+  }
+}
+
+@media (max-width: 1150px) {
+  .roster-summary-grid {
+    grid-template-columns: repeat(2, minmax(200px, 1fr));
+  }
+
+  .personnel-board-header {
+    display: none;
+  }
+
+  .personnel-board-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .add-personnel-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .roster-summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
