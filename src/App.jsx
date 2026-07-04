@@ -339,6 +339,57 @@ function loadStoredData(key, fallback) {
   }
 }
 
+function getApolloModuleTier(ship) {
+  if (ship?.moduleTier) return ship.moduleTier
+
+  if (ship?.configuration?.includes('T1')) return 'T1'
+  if (ship?.configuration?.includes('T2')) return 'T2'
+
+  return 'T3'
+}
+
+function buildApolloBeds(shipId, moduleTier) {
+  const moduleSettings = {
+    T3: {
+      bedsPerSide: 3,
+      tier: 'T3 - Basic',
+      medGelMax: 200,
+    },
+    T2: {
+      bedsPerSide: 2,
+      tier: 'T2 - Standard',
+      medGelMax: 400,
+    },
+    T1: {
+      bedsPerSide: 1,
+      tier: 'T1 - Advanced',
+      medGelMax: 800,
+    },
+  }
+
+  const settings = moduleSettings[moduleTier] || moduleSettings.T3
+  const sides = ['Left', 'Right']
+  const nextBeds = []
+
+  sides.forEach((side) => {
+    for (let index = 1; index <= settings.bedsPerSide; index += 1) {
+      nextBeds.push({
+        id: `${shipId}-${side.toLowerCase()}-${moduleTier.toLowerCase()}-${index}`,
+        shipId,
+        bedName: `${side} ${moduleTier} Bed ${index}`,
+        tier: settings.tier,
+        location: `${side} Module`,
+        status: 'Vacant',
+        medGelCurrent: settings.medGelMax,
+        medGelMax: settings.medGelMax,
+        canisters: 2,
+        respawns: [],
+      })
+    }
+  })
+
+  return nextBeds
+}
 function formatActivityTime() {
   const now = new Date()
   const day = String(now.getDate()).padStart(2, '0')
@@ -501,6 +552,42 @@ useEffect(() => {
       '🧹',
     )
   }
+  function updateApolloModuleConfig(shipId, moduleTier) {
+    const ship = ships.find((item) => item.id === shipId)
+
+    if (!ship) return
+
+    const confirmed = window.confirm(
+      `Change ${ship.name} to ${moduleTier} Module? This will rebuild that Apollo's beds and clear current respawns for that ship.`,
+    )
+
+    if (!confirmed) return
+
+    const rebuiltBeds = buildApolloBeds(shipId, moduleTier)
+
+    setShips((currentShips) =>
+      currentShips.map((item) =>
+        item.id === shipId
+          ? {
+              ...item,
+              moduleTier,
+              configuration: `${moduleTier} Module`,
+            }
+          : item,
+      ),
+    )
+
+    setBeds((currentBeds) => [
+      ...currentBeds.filter((bed) => bed.shipId !== shipId),
+      ...rebuiltBeds,
+    ])
+
+    addActivity(
+      `${ship.name} module configuration changed to ${moduleTier} Module`,
+      shipId,
+      '🧩',
+    )
+  }
 
   function renderPage() {
     if (activePage === 'Beds & Respawns') {
@@ -513,6 +600,7 @@ useEffect(() => {
           addActivity={addActivity}
           clearAllRespawnsForShip={clearAllRespawnsForShip}
           updateShipStatus={updateShipStatus}
+          updateApolloModuleConfig={updateApolloModuleConfig}
         />
       )
     }
@@ -769,6 +857,7 @@ function BedsAndRespawns({
   addActivity,
   clearAllRespawnsForShip,
   updateShipStatus,
+  updateApolloModuleConfig,
 }) {
 const [viewMode, setViewMode] = useState('List View')
 const [draftBeds, setDraftBeds] = useState({})
@@ -1033,6 +1122,48 @@ const [selectedBedId, setSelectedBedId] = useState(null)
           </button>
         </div>
       </div>
+            {selectedShip.id.includes('apollo') && (
+        <div className="apollo-module-selector">
+          <div className="apollo-module-info">
+            <span>Apollo Module Configuration</span>
+            <small>
+              Current: {getApolloModuleTier(selectedShip)} Module •{' '}
+              {selectedShip.configuration}
+            </small>
+          </div>
+
+          <div className="apollo-module-actions">
+            {['T3', 'T2', 'T1'].map((moduleTier) => (
+              <button
+                key={moduleTier}
+                type="button"
+                className={
+                  getApolloModuleTier(selectedShip) === moduleTier
+                    ? 'apollo-module-button active'
+                    : 'apollo-module-button'
+                }
+                onClick={() => {
+                  if (!isAdminMode) {
+                    window.alert('Admin Mode required to change Apollo modules.')
+                    return
+                  }
+
+                  updateApolloModuleConfig(selectedShip.id, moduleTier)
+                }}
+              >
+                <strong>{moduleTier} Module</strong>
+                <small>
+                  {moduleTier === 'T3'
+                    ? '6 beds • 3 per side'
+                    : moduleTier === 'T2'
+                      ? '4 beds • 2 per side'
+                      : '2 beds • 1 per side'}
+                </small>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
       <div className="console-tabs">
         <button
           className={viewMode === 'List View' ? 'active' : ''}
