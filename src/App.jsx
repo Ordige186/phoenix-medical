@@ -337,12 +337,15 @@ function App() {
 
       <main className="main">
         {activePage === 'Dashboard' && (
-          <Dashboard
-            activePersonnel={activePersonnel}
-            shipsReady={shipsReady}
-            pendingRequests={pendingRequests}
-            medicalBeds={medicalBeds}
-          />
+         <Dashboard
+  activePersonnel={activePersonnel}
+  shipsReady={shipsReady}
+  pendingRequests={pendingRequests}
+  medicalBeds={medicalBeds}
+  inventoryItems={inventoryItems}
+  fleetShips={fleetShips}
+  operations={operations}
+/>
         )}
 
         {activePage === 'Personnel' && <Personnel />}
@@ -392,7 +395,24 @@ function App() {
   )
 }
 
-function Dashboard({ activePersonnel, shipsReady, pendingRequests, medicalBeds }) {
+function Dashboard({
+  activePersonnel,
+  shipsReady,
+  pendingRequests,
+  medicalBeds,
+  inventoryItems,
+  fleetShips,
+  operations,
+}) {
+  const lowStockItems = inventoryItems.filter((item) => item.quantity <= 30)
+const offlineShips = fleetShips.filter((ship) => ship.status === 'Offline')
+const criticalOperations = operations.filter(
+  (mission) => mission.priority === 'Critical',
+)
+const reservedBeds = medicalBeds.filter(
+  (bed) => bed.status === 'Reserved' || bed.status === 'Occupied',
+)
+
   return (
     <>
       <section className="hero">
@@ -425,6 +445,57 @@ function Dashboard({ activePersonnel, shipsReady, pendingRequests, medicalBeds }
           <h3>{pendingRequests}</h3>
         </div>
       </section>
+<section className="panel">
+  <div className="panel-header">
+    <div>
+      <p className="eyebrow">System Check</p>
+      <h3>Readiness Summary</h3>
+    </div>
+    <span className="tag">Auto Scan</span>
+  </div>
+
+  <div className="summary-grid">
+    <div className="summary-item">
+      <span>Low Stock</span>
+      <strong>{lowStockItems.length}</strong>
+      <p>
+        {lowStockItems.length > 0
+          ? lowStockItems.map((item) => item.item).join(', ')
+          : 'No low-stock items detected.'}
+      </p>
+    </div>
+
+    <div className="summary-item">
+      <span>Offline Ships</span>
+      <strong>{offlineShips.length}</strong>
+      <p>
+        {offlineShips.length > 0
+          ? offlineShips.map((ship) => ship.name).join(', ')
+          : 'All fleet assets reporting available.'}
+      </p>
+    </div>
+
+    <div className="summary-item">
+      <span>Critical Operations</span>
+      <strong>{criticalOperations.length}</strong>
+      <p>
+        {criticalOperations.length > 0
+          ? criticalOperations.map((mission) => mission.operation).join(', ')
+          : 'No critical operations active.'}
+      </p>
+    </div>
+
+    <div className="summary-item">
+      <span>Reserved / Occupied Beds</span>
+      <strong>{reservedBeds.length}</strong>
+      <p>
+        {reservedBeds.length > 0
+          ? reservedBeds.map((bed) => bed.bed).join(', ')
+          : 'No restricted beds detected.'}
+      </p>
+    </div>
+  </div>
+</section>
 
       <MedicalBedsPreview medicalBeds={medicalBeds} />
     </>
