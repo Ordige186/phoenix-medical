@@ -451,7 +451,7 @@ useEffect(() => {
 
     const timer = setTimeout(() => {
       setBootComplete(true)
-    }, 3200)
+    }, 5200)
 
     return () => clearTimeout(timer)
   }, [isAuthenticated])

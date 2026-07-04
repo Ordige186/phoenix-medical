@@ -3739,3 +3739,430 @@ body {
     grid-template-columns: 1fr;
   }
 }
+/* =========================================================
+   22nd-style Phoenix Loading / Authentication Animation
+   ========================================================= */
+
+.login-screen {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  position: relative;
+  background:
+    radial-gradient(circle at 50% 35%, rgba(239, 68, 68, 0.12), transparent 34%),
+    linear-gradient(rgba(125, 211, 252, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(125, 211, 252, 0.035) 1px, transparent 1px),
+    #02060b !important;
+  background-size:
+    auto,
+    42px 42px,
+    42px 42px,
+    auto;
+}
+
+.login-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(239, 68, 68, 0.09),
+      transparent
+    );
+  transform: translateX(-100%);
+  animation: phoenix-scan 4.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.login-screen::after {
+  content: 'PHOENIX SQUADRON MEDICAL • RESTRICTED ACCESS • PHOENIX SQUADRON MEDICAL • RESTRICTED ACCESS';
+  position: absolute;
+  bottom: 18px;
+  left: 0;
+  width: 100%;
+  color: rgba(125, 211, 252, 0.22);
+  font-size: 10px;
+  letter-spacing: 6px;
+  text-align: center;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Boot console shell */
+.boot-console {
+  width: min(780px, calc(100vw - 42px));
+  min-height: 500px;
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-rows: 64px 1fr 48px;
+  border: 1px solid rgba(239, 68, 68, 0.34);
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg, rgba(10, 15, 24, 0.96), rgba(2, 6, 11, 0.98));
+  box-shadow:
+    0 0 0 1px rgba(125, 211, 252, 0.08),
+    0 0 42px rgba(239, 68, 68, 0.14),
+    inset 0 0 28px rgba(125, 211, 252, 0.035);
+  overflow: hidden;
+}
+
+.boot-console::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      180deg,
+      transparent,
+      rgba(125, 211, 252, 0.04),
+      transparent
+    );
+  transform: translateY(-100%);
+  animation: console-scanline 2.6s linear infinite;
+  pointer-events: none;
+}
+
+.boot-console::after {
+  content: '';
+  position: absolute;
+  inset: 14px;
+  border: 1px solid rgba(125, 211, 252, 0.08);
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+/* Header */
+.boot-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 22px;
+  border-bottom: 1px solid rgba(125, 211, 252, 0.14);
+  background: rgba(239, 68, 68, 0.055);
+}
+
+.boot-header span {
+  color: #dbeafe !important;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+}
+
+.boot-header small {
+  color: #ef4444;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+/* Boot lines */
+.boot-lines {
+  display: grid;
+  align-content: center;
+  gap: 12px;
+  padding: 26px 34px;
+}
+
+.boot-line {
+  margin: 0;
+  opacity: 0;
+  color: #7dd3fc;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-shadow: 0 0 12px rgba(125, 211, 252, 0.18);
+  animation: boot-line-in 0.34s ease forwards;
+}
+
+.boot-line::after {
+  content: ' OK';
+  color: #18d6a3;
+  opacity: 0;
+  animation: boot-ok 0.25s ease forwards;
+  animation-delay: inherit;
+}
+
+/* Delay each line */
+.boot-1 {
+  animation-delay: 0.25s;
+}
+
+.boot-1::after {
+  animation-delay: 0.55s;
+}
+
+.boot-2 {
+  animation-delay: 0.7s;
+}
+
+.boot-2::after {
+  animation-delay: 1s;
+}
+
+.boot-3 {
+  animation-delay: 1.15s;
+}
+
+.boot-3::after {
+  animation-delay: 1.45s;
+}
+
+.boot-4 {
+  animation-delay: 1.6s;
+}
+
+.boot-4::after {
+  animation-delay: 1.9s;
+}
+
+.boot-5 {
+  animation-delay: 2.05s;
+}
+
+.boot-5::after {
+  animation-delay: 2.35s;
+}
+
+.boot-6 {
+  animation-delay: 2.5s;
+}
+
+.boot-6::after {
+  animation-delay: 2.8s;
+}
+
+.boot-7 {
+  color: #fecaca;
+  animation-delay: 3.05s;
+}
+
+.boot-7::after {
+  content: '';
+}
+
+.boot-8 {
+  color: #f87171;
+  animation-delay: 3.55s;
+  animation-name: boot-line-in, auth-pulse;
+  animation-duration: 0.34s, 1.2s;
+  animation-delay: 3.55s, 4s;
+  animation-fill-mode: forwards, none;
+  animation-iteration-count: 1, infinite;
+}
+
+.boot-8::after {
+  content: '';
+}
+
+/* Footer */
+.boot-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  padding: 0 22px;
+  border-top: 1px solid rgba(125, 211, 252, 0.14);
+  background: rgba(2, 8, 14, 0.78);
+}
+
+.boot-footer span {
+  color: #7ea3bf;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.boot-footer span:last-child {
+  color: #18d6a3;
+}
+
+/* Authentication card after boot */
+.login-shell {
+  width: min(560px, calc(100vw - 42px));
+  position: relative;
+  z-index: 2;
+  display: grid;
+  justify-items: center;
+  gap: 20px;
+  animation: login-card-in 0.5s ease forwards;
+}
+
+.login-emblem {
+  width: 112px !important;
+  height: 112px !important;
+  object-fit: contain;
+  filter:
+    drop-shadow(0 0 18px rgba(239, 68, 68, 0.26))
+    drop-shadow(0 0 28px rgba(125, 211, 252, 0.12));
+}
+
+.login-card {
+  width: 100%;
+  padding: 28px;
+  border: 1px solid rgba(239, 68, 68, 0.36) !important;
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg, rgba(10, 15, 24, 0.96), rgba(2, 6, 11, 0.98)) !important;
+  box-shadow:
+    0 0 0 1px rgba(125, 211, 252, 0.08),
+    0 0 36px rgba(239, 68, 68, 0.13);
+}
+
+.login-kicker {
+  color: #ef4444 !important;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+}
+
+.login-card h1 {
+  color: #dbeafe !important;
+  font-size: 28px;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+}
+
+.login-subtitle {
+  color: #7ea3bf !important;
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.login-card input {
+  min-height: 46px;
+  margin-top: 18px;
+  border: 1px solid rgba(125, 211, 252, 0.24) !important;
+  background: rgba(10, 18, 29, 0.96) !important;
+  color: #dbeafe !important;
+  font-size: 16px;
+  letter-spacing: 4px;
+  text-align: center;
+}
+
+.login-card button {
+  min-height: 46px;
+  margin-top: 12px;
+  border: 1px solid rgba(239, 68, 68, 0.58) !important;
+  background: rgba(239, 68, 68, 0.15) !important;
+  color: #fecaca !important;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+}
+
+.login-card button:hover {
+  background: rgba(239, 68, 68, 0.24) !important;
+  box-shadow: 0 0 22px rgba(239, 68, 68, 0.18);
+}
+
+/* Animations */
+@keyframes boot-line-in {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+    filter: blur(3px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes boot-ok {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes phoenix-scan {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  48% {
+    transform: translateX(100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes console-scanline {
+  from {
+    transform: translateY(-100%);
+  }
+
+  to {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes auth-pulse {
+  0%,
+  100% {
+    text-shadow: 0 0 8px rgba(239, 68, 68, 0.12);
+  }
+
+  50% {
+    text-shadow:
+      0 0 12px rgba(239, 68, 68, 0.45),
+      0 0 22px rgba(239, 68, 68, 0.2);
+  }
+}
+
+@keyframes login-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 700px) {
+  .boot-console {
+    min-height: 460px;
+  }
+
+  .boot-header span {
+    font-size: 15px;
+    letter-spacing: 4px;
+  }
+
+  .boot-lines {
+    padding: 22px;
+  }
+
+  .boot-line {
+    font-size: 12px;
+    letter-spacing: 1.5px;
+  }
+
+  .boot-footer {
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
