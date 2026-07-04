@@ -262,14 +262,27 @@ function App() {
         </nav>
 
         <div className="admin-toggle">
-          <p>Access Mode</p>
-          <button
-            className={isAdminMode ? 'mode-button active' : 'mode-button'}
-            onClick={() => setIsAdminMode(!isAdminMode)}
-          >
-            {isAdminMode ? 'Admin Mode' : 'View Mode'}
-          </button>
-        </div>
+  <p>Access Mode</p>
+  <button
+    className={isAdminMode ? 'mode-button active' : 'mode-button'}
+    onClick={() => {
+      if (isAdminMode) {
+        setIsAdminMode(false)
+        return
+      }
+
+      const pin = window.prompt('Enter Phoenix Medical admin PIN')
+
+      if (pin === '186') {
+        setIsAdminMode(true)
+      } else if (pin !== null) {
+        window.alert('Incorrect admin PIN')
+      }
+    }}
+  >
+    {isAdminMode ? 'Admin Mode' : 'View Mode'}
+  </button>
+</div>
       </aside>
 
       <main className="main">
